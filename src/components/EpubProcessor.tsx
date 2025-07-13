@@ -10,12 +10,12 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 
-const EpubProcessor = () => {
+const ZipProcessor = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [statusMessage, setStatusMessage] = useState("");
-  const [outputEpubBlob, setOutputEpubBlob] = useState<Blob | null>(null);
+  const [outputZipBlob, setOutputZipBlob] = useState<Blob | null>(null);
   const [outputFileName, setOutputFileName] = useState("");
   const [processedFileNames, setProcessedFileNames] = useState<string[]>([]);
 
@@ -23,16 +23,16 @@ const EpubProcessor = () => {
     const file = event.target.files?.[0];
     if (file) {
       setSelectedFile(file);
-      setOutputEpubBlob(null); // Reset output when new file is selected
+      setOutputZipBlob(null); // Reset output when new file is selected
       setProcessedFileNames([]);
       setProgress(0);
       setStatusMessage("");
     }
   };
 
-  const processEpub = useCallback(async () => {
+  const processZip = useCallback(async () => {
     if (!selectedFile) {
-      toast.error("Please select an epub file first.");
+      toast.error("Please select a zip file first.");
       return;
     }
 
@@ -40,7 +40,7 @@ const EpubProcessor = () => {
     setProgress(0);
     setStatusMessage("Starting processing...");
     setProcessedFileNames([]);
-    setOutputEpubBlob(null);
+    setOutputZipBlob(null);
 
     try {
       const reader = new ZipReader(new BlobReader(selectedFile));
@@ -61,9 +61,9 @@ const EpubProcessor = () => {
       }
       await reader.close();
 
-      setStatusMessage(`Re-packaging ${filesToProcess.length} files...`);
-      const writer = new ZipWriter(new BlobWriter("application/epub+zip"));
-      const totalFilesToRepackage = filesToProcess.length;
+      setStatusMessage(`Re-zipping ${filesToProcess.length} files...`);
+      const writer = new ZipWriter(new BlobWriter("application/zip"));
+      const totalFilesToRezip = filesToProcess.length;
       let addedCount = 0;
 
       for (const file of filesToProcess) {
@@ -71,21 +71,21 @@ const EpubProcessor = () => {
         // For now, it's a pass-through, so we just add the original blob.
         await writer.add(file.name, new BlobReader(file.blob));
         addedCount++;
-        setProgress(50 + Math.floor((addedCount / totalFilesToRepackage) * 50)); // Update progress for re-packaging phase
+        setProgress(50 + Math.floor((addedCount / totalFilesToRezip) * 50)); // Update progress for re-zipping phase
       }
-      const newEpubBlob = await writer.close();
+      const newZipBlob = await writer.close();
 
-      const newFileName = selectedFile.name.replace(/\.epub$/, "") + "_processed.epub";
-      setOutputEpubBlob(newEpubBlob);
+      const newFileName = selectedFile.name.replace(/\.zip$/, "") + "_processed.zip";
+      setOutputZipBlob(newZipBlob);
       setOutputFileName(newFileName);
       setProgress(100);
       setStatusMessage("Processing complete! Your file is ready for download.");
-      toast.success("EPUB file processed successfully!");
+      toast.success("Zip file processed successfully!");
     } catch (error) {
-      console.error("Error processing epub:", error);
+      console.error("Error processing zip:", error);
       setStatusMessage(`Error: ${error instanceof Error ? error.message : String(error)}`);
-      toast.error("Failed to process epub file.");
-      setOutputEpubBlob(null);
+      toast.error("Failed to process zip file.");
+      setOutputZipBlob(null);
       setProgress(0);
     } finally {
       setIsProcessing(false);
@@ -93,8 +93,8 @@ const EpubProcessor = () => {
   }, [selectedFile]);
 
   const handleDownload = () => {
-    if (outputEpubBlob && outputFileName) {
-      const url = URL.createObjectURL(outputEpubBlob);
+    if (outputZipBlob && outputFileName) {
+      const url = URL.createObjectURL(outputZipBlob);
       const a = document.createElement("a");
       a.href = url;
       a.download = outputFileName;
@@ -111,21 +111,21 @@ const EpubProcessor = () => {
   return (
     <Card className="w-full max-w-2xl mx-auto my-8 p-6 shadow-lg rounded-lg">
       <CardHeader>
-        <CardTitle className="text-3xl font-bold text-center">EPUB File Processor</CardTitle>
+        <CardTitle className="text-3xl font-bold text-center">Zip File Processor</CardTitle>
         <CardDescription className="text-center text-gray-600 mt-2">
-          Upload an epub file, process its contents (pass-through for now), and download the new epub.
+          Upload a zip file, process its contents (pass-through for now), and download the new zip.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Upload Area */}
         <div>
-          <Label htmlFor="epub-file" className="text-lg font-medium mb-2 block">
-            1. Upload your epub file
+          <Label htmlFor="zip-file" className="text-lg font-medium mb-2 block">
+            1. Upload your zip file
           </Label>
           <Input
-            id="epub-file"
+            id="zip-file"
             type="file"
-            accept=".epub"
+            accept=".zip"
             onChange={handleFileChange}
             disabled={isProcessing}
             className="file:text-primary file:font-medium"
@@ -137,11 +137,11 @@ const EpubProcessor = () => {
 
         {/* Process Button */}
         <Button
-          onClick={processEpub}
+          onClick={processZip}
           disabled={!selectedFile || isProcessing}
           className="w-full py-2 text-lg"
         >
-          {isProcessing ? "Processing..." : "2. Process EPUB File"}
+          {isProcessing ? "Processing..." : "2. Process Zip File"}
         </Button>
 
         {/* Status Area */}
@@ -166,12 +166,12 @@ const EpubProcessor = () => {
           <Label className="text-lg font-medium mb-2 block">4. Download Processed File</Label>
           <Button
             onClick={handleDownload}
-            disabled={!outputEpubBlob || isProcessing}
+            disabled={!outputZipBlob || isProcessing}
             className="w-full py-2 text-lg"
           >
-            Download {outputFileName || "Processed EPUB"}
+            Download {outputFileName || "Processed Zip"}
           </Button>
-          {!outputEpubBlob && !isProcessing && selectedFile && (
+          {!outputZipBlob && !isProcessing && selectedFile && (
             <p className="text-sm text-gray-500 mt-2">Processed file will appear here.</p>
           )}
         </div>
@@ -183,4 +183,4 @@ const EpubProcessor = () => {
   );
 };
 
-export default EpubProcessor;
+export default ZipProcessor;

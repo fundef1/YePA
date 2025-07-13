@@ -1,12 +1,12 @@
-# YEAP yet epub another optimizer
+# EPUB Optimizer
 
-*inspired by kiki-le-singe's epub-optimzer (not as fancy though)*
+*inspired by kiki-le-singe's epub-optimizer (not as fancy though)*
 
-it attempts to do everything in-browser, patience, young grasshoper
+It processes EPUB files entirely in-browser - patience, young grasshopper.
 
-available profiles
-1. pass trough (default)
-coming soon
-2. NST (600x800,gray16)
+Available profiles:
+1. Pass-through (default)
+Coming soon:
+2. NST (600x800, gray16)
 
-uses js.zip
+Uses @zip.js/zip.js for EPUB file handling
