@@ -2,7 +2,7 @@ import { BlobReader, BlobWriter, ZipWriter } from "@zip.js/zip.js";
 
 /**
  * Zips an array of file entries into a new Blob (expected to be an EPUB).
- * Ensures 'mimetype' is the first entry and uncompressed.
+ * Ensures 'mimetype' is the first entry and uncompressed, and preserves the order of other files.
  * @param entriesToZip An array of objects, each containing the filename and its Blob data.
  * @param appendLog A callback function to append messages to a log.
  * @param setProgress A callback function to update the progress (50-100%).
@@ -14,7 +14,8 @@ export const zipFileContents = async (
   setProgress: (progress: number) => void
 ): Promise<Blob> => {
   appendLog("Zipping file...");
-  const writer = new ZipWriter(new BlobWriter("application/zip"));
+  // Initialize ZipWriter with keepOrder: true
+  const writer = new ZipWriter(new BlobWriter("application/zip"), { keepOrder: true });
 
   let mimetypeEntry: { filename: string; data: Blob } | undefined;
   const otherEntries: { filename: string; data: Blob }[] = [];
