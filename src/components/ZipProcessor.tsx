@@ -24,6 +24,50 @@ import {
 import { toast } from "sonner";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 
+// Helper function to unzip a file and extract its contents
+const unzipFileContents = async (
+  file: File,
+  appendLog: (message: string) => void,
+  setProgress: (progress: number) => void
+): Promise<{ filename: string; data: Blob }[]> => {
+  appendLog("Unzipping file...");
+  const reader = new ZipReader(new BlobReader(file));
+  const entries = await reader.getEntries();
+  appendLog(`Found ${entries.length} entries.`);
+
+  const extractedEntries: { filename: string; data: Blob }[] = [];
+  for (let i = 0; i < entries.length; i++) {
+    const entry = entries[i];
+    appendLog(`Extracting: ${entry.filename}`);
+    const data = await entry.getData(new BlobWriter());
+    extractedEntries.push({ filename: entry.filename, data });
+    setProgress(((i + 1) / entries.length) * 50); // Progress for unzipping (0-50%)
+  }
+  await reader.close();
+  appendLog("Unzipping complete.");
+  return extractedEntries;
+};
+
+// Helper function to zip contents into a new file
+const zipFileContents = async (
+  entriesToZip: { filename: string; data: Blob }[],
+  appendLog: (message: string) => void,
+  setProgress: (progress: number) => void
+): Promise<Blob> => {
+  appendLog("Zipping file...");
+  const writer = new ZipWriter(new BlobWriter("application/zip"));
+
+  for (let i = 0; i < entriesToZip.length; i++) {
+    const entry = entriesToZip[i];
+    appendLog(`Adding to zip: ${entry.filename}`);
+    await writer.add(entry.filename, new BlobReader(entry.data));
+    setProgress(50 + ((i + 1) / entriesToZip.length) * 50); // Progress for zipping (50-100%)
+  }
+  const blob = await writer.close();
+  appendLog("Zipping complete.");
+  return blob;
+};
+
 const ZipProcessor = () => {
   const [file, setFile] = useState<File | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
@@ -57,25 +101,18 @@ const ZipProcessor = () => {
     appendLog(`Using template: ${template}`);
 
     try {
-      const reader = new ZipReader(new BlobReader(file));
-      const entries = await reader.getEntries();
-      appendLog(`Found ${entries.length} entries in the EPUB.`);
+      let processedEntries: { filename: string; data: Blob }[] = [];
 
-      const writer = new ZipWriter(new BlobWriter("application/zip"));
+      // Step 1: Unzip the file
+      processedEntries = await unzipFileContents(file, appendLog, setProgress);
 
-      for (let i = 0; i < entries.length; i++) {
-        const entry = entries[i];
-        appendLog(`Processing: ${entry.filename}`);
-        
-        const data = await entry.getData(new BlobWriter());
-        await writer.add(entry.filename, new BlobReader(data));
+      // Step 2: Apply template-specific logic (currently only pass-through)
+      // For the 'pass-through' template, no modifications are made to the entries.
+      appendLog("Applying pass-through template (no modifications).");
 
-        const currentProgress = ((i + 1) / entries.length) * 100;
-        setProgress(currentProgress);
-      }
+      // Step 3: Zip the processed entries back into a new file
+      const blob = await zipFileContents(processedEntries, appendLog, setProgress);
 
-      appendLog("Finalizing the new EPUB file...");
-      const blob = await writer.close();
       setProcessedFile(blob);
       appendLog("Processing complete!");
       toast.success("EPUB processed successfully!");
@@ -86,7 +123,7 @@ const ZipProcessor = () => {
     } finally {
       setIsProcessing(false);
     }
-  }, [file, template, appendLog]);
+  }, [file, template, appendLog, setProgress]);
 
   useEffect(() => {
     // Only process if a file is selected, not currently processing, and hasn't been processed yet
