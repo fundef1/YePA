@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback, useRef } from "react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
 import { ZipReader, BlobReader, BlobWriter, ZipWriter } from "@zip.js/zip.js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,32 +43,16 @@ const ZipProcessor = () => {
     }, 0);
   }, []);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = event.target.files?.[0];
-    if (selectedFile) {
-      if (selectedFile.name.endsWith(".epub")) {
-        setFile(selectedFile);
-        setFileName(selectedFile.name);
-        setProcessedFile(null);
-        setLogs([]);
-        setProgress(0);
-        appendLog(`File selected: ${selectedFile.name}`);
-      } else {
-        toast.error("Please select a valid .epub file.");
-        event.target.value = "";
-      }
-    }
-  };
-
   const processFile = useCallback(async () => {
     if (!file) {
-      toast.error("No file selected.");
+      // This should ideally not happen if called correctly after file selection
+      toast.error("No file selected for processing.");
       return;
     }
 
     setIsProcessing(true);
     setProcessedFile(null);
-    setLogs([]);
+    setLogs([]); // Clear logs for new processing
     setProgress(0);
     appendLog("Processing started...");
     appendLog(`Using template: ${template}`);
@@ -104,6 +88,26 @@ const ZipProcessor = () => {
       setIsProcessing(false);
     }
   }, [file, template, appendLog]);
+
+  useEffect(() => {
+    if (file && !isProcessing) {
+      processFile();
+    }
+  }, [file, isProcessing, processFile]);
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = event.target.files?.[0];
+    if (selectedFile) {
+      if (selectedFile.name.endsWith(".epub")) {
+        setFile(selectedFile);
+        setFileName(selectedFile.name);
+        // Processing will be triggered by the useEffect hook
+      } else {
+        toast.error("Please select a valid .epub file.");
+        event.target.value = ""; // Clear the input
+      }
+    }
+  };
 
   const downloadFile = () => {
     if (!processedFile || !fileName) return;
@@ -142,12 +146,6 @@ const ZipProcessor = () => {
           <Label htmlFor="file-upload">2. Upload EPUB File</Label>
           <Input id="file-upload" type="file" accept=".epub" onChange={handleFileChange} disabled={isProcessing} />
         </div>
-
-        {file && (
-          <Button onClick={processFile} disabled={isProcessing || !file} className="w-full">
-            {isProcessing ? "Processing..." : "Process File"}
-          </Button>
-        )}
 
         {(isProcessing || logs.length > 0) && (
           <div className="space-y-2">
