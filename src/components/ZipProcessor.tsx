@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useCallback, useRef, useEffect } from "react";
-import { ZipReader, BlobReader, BlobWriter, ZipWriter } from "@zip.js/zip.js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
@@ -23,50 +22,8 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { MadeWithDyad } from "@/components/made-with-dyad";
-
-// Helper function to unzip a file and extract its contents
-const unzipFileContents = async (
-  file: File,
-  appendLog: (message: string) => void,
-  setProgress: (progress: number) => void
-): Promise<{ filename: string; data: Blob }[]> => {
-  appendLog("Unzipping file...");
-  const reader = new ZipReader(new BlobReader(file));
-  const entries = await reader.getEntries();
-  appendLog(`Found ${entries.length} entries.`);
-
-  const extractedEntries: { filename: string; data: Blob }[] = [];
-  for (let i = 0; i < entries.length; i++) {
-    const entry = entries[i];
-    appendLog(`Extracting: ${entry.filename}`);
-    const data = await entry.getData(new BlobWriter());
-    extractedEntries.push({ filename: entry.filename, data });
-    setProgress(((i + 1) / entries.length) * 50); // Progress for unzipping (0-50%)
-  }
-  await reader.close();
-  appendLog("Unzipping complete.");
-  return extractedEntries;
-};
-
-// Helper function to zip contents into a new file
-const zipFileContents = async (
-  entriesToZip: { filename: string; data: Blob }[],
-  appendLog: (message: string) => void,
-  setProgress: (progress: number) => void
-): Promise<Blob> => {
-  appendLog("Zipping file...");
-  const writer = new ZipWriter(new BlobWriter("application/zip"));
-
-  for (let i = 0; i < entriesToZip.length; i++) {
-    const entry = entriesToZip[i];
-    appendLog(`Adding to zip: ${entry.filename}`);
-    await writer.add(entry.filename, new BlobReader(entry.data));
-    setProgress(50 + ((i + 1) / entriesToZip.length) * 50); // Progress for zipping (50-100%)
-  }
-  const blob = await writer.close();
-  appendLog("Zipping complete.");
-  return blob;
-};
+import { unzipFileContents } from "@/lib/unzip"; // Import the new unzip function
+import { zipFileContents } from "@/lib/zip";     // Import the new zip function
 
 const ZipProcessor = () => {
   const [file, setFile] = useState<File | null>(null);
