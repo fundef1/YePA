@@ -45,13 +45,12 @@ const ZipProcessor = () => {
 
   const processFile = useCallback(async () => {
     if (!file) {
-      // This should ideally not happen if called correctly after file selection
       toast.error("No file selected for processing.");
       return;
     }
 
     setIsProcessing(true);
-    setProcessedFile(null);
+    setProcessedFile(null); // Reset processed file state at the start of new processing
     setLogs([]); // Clear logs for new processing
     setProgress(0);
     appendLog("Processing started...");
@@ -90,10 +89,11 @@ const ZipProcessor = () => {
   }, [file, template, appendLog]);
 
   useEffect(() => {
-    if (file && !isProcessing) {
+    // Only process if a file is selected, not currently processing, and hasn't been processed yet
+    if (file && !isProcessing && !processedFile) {
       processFile();
     }
-  }, [file, isProcessing, processFile]);
+  }, [file, isProcessing, processedFile, processFile]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
@@ -101,7 +101,10 @@ const ZipProcessor = () => {
       if (selectedFile.name.endsWith(".epub")) {
         setFile(selectedFile);
         setFileName(selectedFile.name);
-        // Processing will be triggered by the useEffect hook
+        setProcessedFile(null); // Crucial: Reset processedFile when a new file is selected
+        setLogs([]); // Clear logs for new file selection
+        setProgress(0);
+        appendLog(`File selected: ${selectedFile.name}`);
       } else {
         toast.error("Please select a valid .epub file.");
         event.target.value = ""; // Clear the input
