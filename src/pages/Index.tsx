@@ -1,4 +1,3 @@
-import { MadeWithDyad } from "@/components/made-with-dyad";
 import ZipProcessor from "@/components/ZipProcessor";
 
 const Index = () => {
