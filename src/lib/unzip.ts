@@ -2,7 +2,6 @@ import { ZipReader, BlobReader, BlobWriter } from "@zip.js/zip.js";
 
 /**
  * Unzips a given file (expected to be an EPUB) and extracts its contents.
- * Corrects file paths by removing any leading directory that matches the uploaded file's name or its base name.
  * @param file The EPUB file to unzip.
  * @param appendLog A callback function to append messages to a log.
  * @param setProgress A callback function to update the progress (0-50%).
@@ -19,24 +18,11 @@ export const unzipFileContents = async (
   appendLog(`Found ${entries.length} entries.`);
 
   const extractedEntries: { filename: string; data: Blob }[] = [];
-  // Prepare potential prefixes to strip
-  const uploadedFileNameWithSlash = file.name + '/'; // e.g., "my_book.epub/"
-  const uploadedFileNameWithoutExtWithSlash = file.name.replace(/\.epub$/, '') + '/'; // e.g., "my_book/"
-
   for (let i = 0; i < entries.length; i++) {
     const entry = entries[i];
-    let cleanFilename = entry.filename;
-
-    // Remove leading directory if it matches the uploaded file's name or its base name
-    if (cleanFilename.startsWith(uploadedFileNameWithSlash)) {
-      cleanFilename = cleanFilename.substring(uploadedFileNameWithSlash.length);
-    } else if (cleanFilename.startsWith(uploadedFileNameWithoutExtWithSlash)) {
-      cleanFilename = cleanFilename.substring(uploadedFileNameWithoutExtWithSlash.length);
-    }
-    
-    appendLog(`Extracting: ${entry.filename} -> ${cleanFilename}`);
+    appendLog(`Extracting: ${entry.filename}`);
     const data = await entry.getData(new BlobWriter());
-    extractedEntries.push({ filename: cleanFilename, data });
+    extractedEntries.push({ filename: entry.filename, data });
     setProgress(((i + 1) / entries.length) * 50); // Progress for unzipping (0-50%)
   }
   await reader.close();
