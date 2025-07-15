@@ -23,19 +23,6 @@ export const unzipFileContents = async (
     return [];
   }
 
-  // Detect and determine a common root folder path
-  let rootPath = "";
-  const firstEntryPath = entries[0].filename;
-  const firstSlashIndex = firstEntryPath.indexOf('/');
-  
-  if (firstSlashIndex > -1) {
-    const potentialRoot = firstEntryPath.substring(0, firstSlashIndex + 1);
-    if (entries.every(entry => entry.filename.startsWith(potentialRoot))) {
-      rootPath = potentialRoot;
-      appendLog(`Detected common root folder: ${rootPath}. Stripping it from file paths.`);
-    }
-  }
-
   const extractedEntries: { filename: string; data: Blob }[] = [];
   for (let i = 0; i < entries.length; i++) {
     const entry = entries[i];
