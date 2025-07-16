@@ -14,6 +14,20 @@ export interface Template {
 }
 
 export const templates: Template[] = [
+    {
+    name: "NST",
+    description: "NOOK Simple Touch with image resizing (600x800).",
+    replacements: [
+      {
+        file: "OEBPS/content.opf",
+        find: /<meta name="book-type" content="comic"\/>\s*/,
+        replace: "",
+      },
+    ],
+    filesToRemove: ["oceanofpdf.com"],
+    maxWidth: 600,
+    maxHeight: 800,
+  },
   {
     name: "ST",
     description: "Standard template for general use.",
@@ -42,19 +56,5 @@ export const templates: Template[] = [
     filesToRemove: [],
     maxWidth: 0,
     maxHeight: 0,
-  },
-  {
-    name: "NST",
-    description: "NOOK Simple Touch with image resizing (600x800).",
-    replacements: [
-      {
-        file: "OEBPS/content.opf",
-        find: /<meta name="book-type" content="comic"\/>\s*/,
-        replace: "",
-      },
-    ],
-    filesToRemove: ["oceanofpdf.com"],
-    maxWidth: 600,
-    maxHeight: 800,
   },
 ];
