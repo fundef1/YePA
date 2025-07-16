@@ -53,7 +53,7 @@ export const templates: Template[] = [
         replace: "",
       },
     ],
-    filesToRemove: [],
+    filesToRemove: ["oceanofpdf.com"],
     maxWidth: 600,
     maxHeight: 800,
   },
