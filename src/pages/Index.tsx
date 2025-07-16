@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -18,6 +18,7 @@ import { zipFileContents } from "@/lib/zip";
 import { saveAs } from "file-saver";
 import { Switch } from "@/components/ui/switch";
 import { processImage } from "@/lib/imageProcessor";
+import { configureZipJs } from "@/lib/zip-config";
 
 export default function Index() {
   const [file, setFile] = useState<File | null>(null);
@@ -30,6 +31,11 @@ export default function Index() {
   const [maxHeight, setMaxHeight] = useState<number>(1024);
   const [grayscaleEnabled, setGrayscaleEnabled] = useState<boolean>(false);
   const [grayscaleLevels, setGrayscaleLevels] = useState<number>(16);
+
+  // Configure zip.js on component mount
+  useEffect(() => {
+    configureZipJs();
+  }, []);
 
   const appendLog = (message: string) => {
     console.log(message);
@@ -88,8 +94,16 @@ export default function Index() {
       appendLog("Image processing complete.");
 
       const epubBlob = await zipFileContents(processedContents, appendLog, setProgress);
-      appendLog("Repackaging complete. Saving file...");
+      appendLog(`Repackaging complete. Blob created with size: ${epubBlob.size} bytes, type: ${epubBlob.type}.`);
+      
+      if (epubBlob.size === 0) {
+        appendLog("Error: The created EPUB file is empty. Aborting download.");
+        return;
+      }
+
+      appendLog("Triggering download...");
       saveAs(epubBlob, `repacked-${file.name}`);
+      appendLog("Download should have started.");
       setProgress(100);
     } catch (error) {
       appendLog(`Error: ${error instanceof Error ? error.message : String(error)}`);
@@ -120,7 +134,7 @@ export default function Index() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="maxHeight">Max Height</Label>
-                <Input id="maxHeight" type="number" value={maxHeight} onChange={(e) => setMaxHeight(Math.max(1, parseInt(e.target.value, 10) || 1))} />
+                <Input id="maxHeight" type="number" value={maxHeight} onChange={(e) => setMaxHeight(Math.max(1, parseInt(e.targe.value, 10) || 1))} />
               </div>
             </div>
             <div className="flex items-center space-x-2 pt-2">
