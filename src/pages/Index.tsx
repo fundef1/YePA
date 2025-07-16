@@ -14,8 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { unzipEpub } from "../lib/unzip";
 import { applyTemplate } from "../lib/template-applier";
 import { zipFileContents } from "../lib/zip";
-import { downloadFile } from "../lib/download";
-import { templates, Template } from "../lib/templates";
+import { templates } from "../lib/templates";
 import { resizeImages } from "../lib/resize";
 
 export default function Index() {
@@ -26,12 +25,17 @@ export default function Index() {
   const [selectedTemplate, setSelectedTemplate] = useState<string>(
     templates[0].name
   );
+  const [processedBlob, setProcessedBlob] = useState<Blob | null>(null);
+  const [processedFilename, setProcessedFilename] = useState<string>("");
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
-      setSelectedFile(event.target.files[0]);
-      setLog(`Selected file: ${event.target.files[0].name}`);
+      const file = event.target.files[0];
+      setSelectedFile(file);
+      setLog(`Selected file: ${file.name}`);
       setProgress(0);
+      setProcessedBlob(null); // Reset previous results
+      setProcessedFilename("");
     }
   };
 
@@ -41,6 +45,8 @@ export default function Index() {
 
   const processEpub = async (file: File, templateName: string) => {
     setIsProcessing(true);
+    setProcessedBlob(null);
+    setProcessedFilename("");
     setLog(`Starting processing with template: ${templateName}...`);
     setProgress(0);
 
@@ -80,9 +86,10 @@ export default function Index() {
         setProgress(75 + p * 0.25)
       );
 
-      // 5. Download
-      downloadFile(finalBlob, file.name.replace(".epub", `_${templateName}.epub`));
-      appendLog("Processing complete! File downloaded.");
+      // 5. Set blob for download
+      setProcessedBlob(finalBlob);
+      setProcessedFilename(file.name.replace(".epub", `_${templateName}.epub`));
+      appendLog("Processing complete! Click 'Download File' to save.");
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "An unknown error occurred";
@@ -92,6 +99,19 @@ export default function Index() {
       setIsProcessing(false);
       setProgress(100);
     }
+  };
+
+  const handleDownload = () => {
+    if (!processedBlob || !processedFilename) return;
+    const url = URL.createObjectURL(processedBlob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = processedFilename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    appendLog(`Downloaded ${processedFilename}.`);
   };
 
   return (
@@ -129,6 +149,11 @@ export default function Index() {
         >
           {isProcessing ? "Processing..." : "Process EPUB"}
         </Button>
+        {processedBlob && !isProcessing && (
+          <Button onClick={handleDownload} variant="secondary">
+            Download File
+          </Button>
+        )}
       </div>
       {isProcessing && (
         <div className="w-full mb-4">
