@@ -1,0 +1,60 @@
+export interface Replacement {
+  file: string;
+  find: RegExp;
+  replace: string;
+}
+
+export interface Template {
+  name: string;
+  description: string;
+  replacements: Replacement[];
+  filesToRemove: string[];
+  maxWidth: number;
+  maxHeight: number;
+}
+
+export const templates: Template[] = [
+  {
+    name: "ST",
+    description: "Standard template for general use.",
+    replacements: [
+      {
+        file: "OEBPS/content.opf",
+        find: /<meta name="book-type" content="comic"\/>\s*/,
+        replace: "",
+      },
+    ],
+    filesToRemove: ["OEBPS/toc.ncx"],
+    maxWidth: 0,
+    maxHeight: 0,
+  },
+  {
+    name: "Kobo",
+    description: "Template optimized for Kobo devices.",
+    replacements: [
+      {
+        file: "OEBPS/content.opf",
+        find: /<meta name="book-type" content="comic"\/>\s*/,
+        replace:
+          '<meta name="book-type" content="comic"/>\n<meta name="fixed-layout" content="true"/>\n<meta name="orientation-lock" content="portrait"/>\n',
+      },
+    ],
+    filesToRemove: [],
+    maxWidth: 0,
+    maxHeight: 0,
+  },
+  {
+    name: "NST",
+    description: "New standard template with image resizing (600x800).",
+    replacements: [
+      {
+        file: "OEBPS/content.opf",
+        find: /<meta name="book-type" content="comic"\/>\s*/,
+        replace: "",
+      },
+    ],
+    filesToRemove: ["OEBPS/toc.ncx"],
+    maxWidth: 600,
+    maxHeight: 800,
+  },
+];
