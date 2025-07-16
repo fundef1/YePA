@@ -24,7 +24,7 @@ export const templates: Template[] = [
         replace: "",
       },
     ],
-    filesToRemove: ["OEBPS/toc.ncx"],
+    filesToRemove: [],
     maxWidth: 0,
     maxHeight: 0,
   },
@@ -45,7 +45,7 @@ export const templates: Template[] = [
   },
   {
     name: "NST",
-    description: "New standard template with image resizing (600x800).",
+    description: "NOOK Simple Touch with image resizing (600x800).",
     replacements: [
       {
         file: "OEBPS/content.opf",
@@ -53,7 +53,7 @@ export const templates: Template[] = [
         replace: "",
       },
     ],
-    filesToRemove: ["OEBPS/toc.ncx"],
+    filesToRemove: [],
     maxWidth: 600,
     maxHeight: 800,
   },
