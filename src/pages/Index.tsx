@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { unzipEpub } from "../lib/unzip";
-import { parseOpf } from "../lib/opf";
 import { applyTemplate } from "../lib/template-applier";
 import { zipFileContents } from "../lib/zip";
 import { downloadFile } from "../lib/download";
@@ -58,19 +57,15 @@ export default function Index() {
         setProgress(p * 0.25)
       );
 
-      // 2. Parse OPF to find path
-      const { opfPath } = await parseOpf(entries, appendLog);
-
-      // 3. Apply Template (25-50%)
+      // 2. Apply Template (25-50%)
       let modifiedEntries = await applyTemplate(
         entries,
         currentTemplate,
-        opfPath,
         appendLog,
         (p) => setProgress(25 + p * 0.25)
       );
 
-      // 4. Resize Images (50-75%)
+      // 3. Resize Images (50-75%)
       const { maxWidth, maxHeight } = currentTemplate;
       modifiedEntries = await resizeImages(
         modifiedEntries,
@@ -80,12 +75,12 @@ export default function Index() {
         (p) => setProgress(50 + p * 0.25)
       );
 
-      // 5. Zip (75-100%)
+      // 4. Zip (75-100%)
       const finalBlob = await zipFileContents(modifiedEntries, appendLog, (p) =>
         setProgress(75 + p * 0.25)
       );
 
-      // 6. Download
+      // 5. Download
       downloadFile(finalBlob, file.name.replace(".epub", `_${templateName}.epub`));
       appendLog("Processing complete! File downloaded.");
     } catch (error) {
