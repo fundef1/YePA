@@ -15,7 +15,7 @@ import { unzipEpub } from "../lib/unzip";
 import { applyTemplate } from "../lib/template-applier";
 import { zipFileContents } from "../lib/zip";
 import { templates } from "../lib/templates";
-import { resizeImages } from "../lib/resize";
+import { resizeImages, grayscaleImages } from "../lib/resize";
 
 export default function Index() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -58,35 +58,43 @@ export default function Index() {
     }
 
     try {
-      // 1. Unzip (0-25%)
+      // 1. Unzip (0-20%)
       let entries = await unzipEpub(file, appendLog, (p) =>
-        setProgress(p * 0.25)
+        setProgress(p * 0.20)
       );
 
-      // 2. Apply Template (25-50%)
+      // 2. Apply Template (20-40%)
       let modifiedEntries = await applyTemplate(
         entries,
         currentTemplate,
         appendLog,
-        (p) => setProgress(25 + p * 0.25)
+        (p) => setProgress(20 + p * 0.20)
       );
 
-      // 3. Resize Images (50-75%)
-      const { maxWidth, maxHeight } = currentTemplate;
+      // 3. Resize Images (40-60%)
+      const { maxWidth, maxHeight, grayscaleLevels } = currentTemplate;
       modifiedEntries = await resizeImages(
         modifiedEntries,
         maxWidth,
         maxHeight,
         appendLog,
-        (p) => setProgress(50 + p * 0.25)
+        (p) => setProgress(40 + p * 0.20)
       );
 
-      // 4. Zip (75-100%)
+      // 4. Grayscale Images (60-80%)
+      modifiedEntries = await grayscaleImages(
+        modifiedEntries,
+        grayscaleLevels,
+        appendLog,
+        (p) => setProgress(60 + p * 0.20)
+      );
+
+      // 5. Zip (80-100%)
       const finalBlob = await zipFileContents(modifiedEntries, appendLog, (p) =>
-        setProgress(75 + p * 0.25)
+        setProgress(80 + p * 0.20)
       );
 
-      // 5. Set blob for download
+      // 6. Set blob for download
       setProcessedBlob(finalBlob);
       setProcessedFilename(file.name.replace(".epub", `_${templateName}.epub`));
       appendLog("Processing complete! Click 'Download File' to save.");
@@ -108,7 +116,7 @@ export default function Index() {
     a.href = url;
     a.download = processedFilename;
     document.body.appendChild(a);
-    a.click();
+a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     appendLog(`Downloaded ${processedFilename}.`);

@@ -11,12 +11,13 @@ export interface Template {
   filesToRemove: string[];
   maxWidth: number;
   maxHeight: number;
+  grayscaleLevels: number;
 }
 
 export const templates: Template[] = [
     {
     name: "NST",
-    description: "NOOK Simple Touch with image resizing (600x800).",
+    description: "NOOK Simple Touch with image resizing (600x800) and 16-level grayscale.",
     replacements: [
       {
         file: "OEBPS/content.opf",
@@ -27,6 +28,7 @@ export const templates: Template[] = [
     filesToRemove: ["oceanofpdf.com"],
     maxWidth: 600,
     maxHeight: 800,
+    grayscaleLevels: 16,
   },
   {
     name: "ST",
@@ -41,6 +43,7 @@ export const templates: Template[] = [
     filesToRemove: [],
     maxWidth: 0,
     maxHeight: 0,
+    grayscaleLevels: 0,
   },
   {
     name: "Kobo",
@@ -56,5 +59,6 @@ export const templates: Template[] = [
     filesToRemove: [],
     maxWidth: 0,
     maxHeight: 0,
+    grayscaleLevels: 0,
   },
 ];
