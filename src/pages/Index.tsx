@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { unzipEpub } from "../lib/unzip";
@@ -29,36 +29,11 @@ export default function Index() {
   const [processedFilename, setProcessedFilename] = useState<string>("");
   const logContainerRef = useRef<HTMLPreElement>(null);
 
-  useEffect(() => {
-    if (logContainerRef.current) {
-      logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
-    }
-  }, [log]);
-
-  const handleFileChange = (file: File | null) => {
-    setSelectedFile(file);
-    if (file) {
-      setLog([`Selected file: ${file.name}`]);
-    } else {
-      setLog([]);
-    }
-    setProgress(0);
-    setProcessedBlob(null);
-    setProcessedFilename("");
-  };
-
-  const handleTemplateChange = (templateName: string) => {
-    const newTemplate = templates.find((t) => t.name === templateName);
-    if (newTemplate) {
-      setSelectedTemplate(newTemplate);
-    }
-  };
-
-  const appendLog = (message: string) => {
+  const appendLog = useCallback((message: string) => {
     setLog((prevLog) => [...prevLog, message]);
-  };
+  }, []);
 
-  const processEpub = async (file: File, templateName: string) => {
+  const processEpub = useCallback(async (file: File, templateName: string) => {
     setIsProcessing(true);
     setProcessedBlob(null);
     setProcessedFilename("");
@@ -111,6 +86,36 @@ export default function Index() {
       setIsProcessing(false);
       setProgress(100);
     }
+  }, [appendLog]);
+
+  useEffect(() => {
+    if (logContainerRef.current) {
+      logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
+    }
+  }, [log]);
+  
+  useEffect(() => {
+    if (selectedFile) {
+      processEpub(selectedFile, selectedTemplate.name);
+    }
+  }, [selectedFile, selectedTemplate, processEpub]);
+
+  const handleFileChange = (file: File | null) => {
+    setSelectedFile(file);
+    // Reset state when file changes
+    if (!file) {
+      setLog([]);
+      setProgress(0);
+      setProcessedBlob(null);
+      setProcessedFilename("");
+    }
+  };
+
+  const handleTemplateChange = (templateName: string) => {
+    const newTemplate = templates.find((t) => t.name === templateName);
+    if (newTemplate) {
+      setSelectedTemplate(newTemplate);
+    }
   };
 
   const handleDownload = () => {
@@ -147,18 +152,15 @@ export default function Index() {
               <FileUploader onFileSelect={handleFileChange} disabled={isProcessing} />
             </div>
             <div className="space-y-2">
-              <Label>3. Process and Download</Label>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button
-                  onClick={() => selectedFile && processEpub(selectedFile, selectedTemplate.name)}
-                  disabled={!selectedFile || isProcessing}
-                  className="w-full"
-                >
-                  {isProcessing ? "Processing..." : "Process EPUB"}
-                </Button>
-                {processedBlob && !isProcessing && (
-                  <Button onClick={handleDownload} variant="secondary" className="w-full">
-                    Download File
+              <Label>3. Download your ePUB</Label>
+              <div className="flex flex-col sm:flex-row gap-4 min-h-[40px]">
+                {selectedFile && (
+                  <Button
+                    onClick={handleDownload}
+                    disabled={isProcessing || !processedBlob}
+                    className="w-full"
+                  >
+                    {isProcessing ? "Processing..." : "Download File"}
                   </Button>
                 )}
               </div>
