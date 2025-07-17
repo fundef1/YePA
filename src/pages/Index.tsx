@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -10,16 +10,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { unzipEpub } from "../lib/unzip";
 import { applyTemplate } from "../lib/template-applier";
 import { zipFileContents } from "../lib/zip";
 import { templates } from "../lib/templates";
 import { resizeImages, grayscaleImages } from "../lib/pipeline";
+import { Header } from "@/components/Header";
+import { FileUploader } from "@/components/FileUploader";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { MadeWithDyad } from "@/components/made-with-dyad";
+import { Separator } from "@/components/ui/separator";
 
 export default function Index() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [log, setLog] = useState<string>("");
+  const [log, setLog] = useState<string[]>([]);
   const [progress, setProgress] = useState<number>(0);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [selectedTemplate, setSelectedTemplate] = useState<string>(
@@ -27,27 +32,35 @@ export default function Index() {
   );
   const [processedBlob, setProcessedBlob] = useState<Blob | null>(null);
   const [processedFilename, setProcessedFilename] = useState<string>("");
+  const logContainerRef = useRef<HTMLPreElement>(null);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      const file = event.target.files[0];
-      setSelectedFile(file);
-      setLog(`Selected file: ${file.name}`);
-      setProgress(0);
-      setProcessedBlob(null); // Reset previous results
-      setProcessedFilename("");
+  useEffect(() => {
+    if (logContainerRef.current) {
+      logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
     }
+  }, [log]);
+
+  const handleFileChange = (file: File | null) => {
+    setSelectedFile(file);
+    if (file) {
+      setLog([`Selected file: ${file.name}`]);
+    } else {
+      setLog([]);
+    }
+    setProgress(0);
+    setProcessedBlob(null);
+    setProcessedFilename("");
   };
 
   const appendLog = (message: string) => {
-    setLog((prevLog) => `${prevLog}\n${message}`);
+    setLog((prevLog) => [...prevLog, message]);
   };
 
   const processEpub = async (file: File, templateName: string) => {
     setIsProcessing(true);
     setProcessedBlob(null);
     setProcessedFilename("");
-    setLog(`Starting processing with template: ${templateName}...`);
+    setLog([`Starting processing with template: ${templateName}...`]);
     setProgress(0);
 
     const currentTemplate = templates.find((t) => t.name === templateName);
@@ -58,43 +71,32 @@ export default function Index() {
     }
 
     try {
-      // 1. Unzip (0-20%)
       let entries = await unzipEpub(file, appendLog, (p) =>
-        setProgress(p * 0.20)
+        setProgress(p * 0.25)
       );
-
-      // 2. Apply Template (20-40%)
       let modifiedEntries = await applyTemplate(
         entries,
         currentTemplate,
         appendLog,
-        (p) => setProgress(20 + p * 0.20)
+        (p) => setProgress(25 + p * 0.25)
       );
-
-      // 3. Resize Images (40-60%)
       const { maxWidth, maxHeight, grayscaleLevels } = currentTemplate;
       modifiedEntries = await resizeImages(
         modifiedEntries,
         maxWidth,
         maxHeight,
         appendLog,
-        (p) => setProgress(40 + p * 0.20)
+        (p) => setProgress(50 + p * 0.25)
       );
-
-      // 4. Grayscale Images (60-80%)
       modifiedEntries = await grayscaleImages(
         modifiedEntries,
         grayscaleLevels,
         appendLog,
-        (p) => setProgress(60 + p * 0.20)
+        (p) => setProgress(75 + p * 0.15)
       );
-
-      // 5. Zip (80-100%)
       const finalBlob = await zipFileContents(modifiedEntries, appendLog, (p) =>
-        setProgress(80 + p * 0.20)
+        setProgress(90 + p * 0.10)
       );
-
-      // 6. Set blob for download
       setProcessedBlob(finalBlob);
       setProcessedFilename(file.name.replace(".epub", `_${templateName}.epub`));
       appendLog("Processing complete! Click 'Download File' to save.");
@@ -116,65 +118,88 @@ export default function Index() {
     a.href = url;
     a.download = processedFilename;
     document.body.appendChild(a);
-a.click();
+    a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     appendLog(`Downloaded ${processedFilename}.`);
   };
 
   return (
-    <div className="container mx-auto p-4 max-w-2xl">
-      <h1 className="text-2xl font-bold mb-4">EPUB Processor</h1>
-      <div className="grid w-full items-center gap-2 mb-4">
-        <input
-          id="epub-file"
-          type="file"
-          accept=".epub"
-          onChange={handleFileChange}
-          className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-        />
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 py-8 sm:py-12">
+      <div className="container mx-auto max-w-3xl">
+        <Header />
+        <Card className="w-full shadow-lg dark:shadow-black/20">
+          <CardHeader>
+            <CardTitle>Optimization Controls</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-2">
+              <Label>1. Upload your EPUB</Label>
+              <FileUploader onFileSelect={handleFileChange} disabled={isProcessing} />
+            </div>
+            <div className="space-y-2">
+              <Label>2. Select an optimization profile</Label>
+              <Select
+                onValueChange={setSelectedTemplate}
+                defaultValue={selectedTemplate}
+                disabled={isProcessing || !selectedFile}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a template" />
+                </SelectTrigger>
+                <SelectContent>
+                  {templates.map((template) => (
+                    <SelectItem key={template.name} value={template.name}>
+                      {template.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>3. Process and Download</Label>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button
+                  onClick={() => selectedFile && processEpub(selectedFile, selectedTemplate)}
+                  disabled={!selectedFile || isProcessing}
+                  className="w-full"
+                >
+                  {isProcessing ? "Processing..." : "Process EPUB"}
+                </Button>
+                {processedBlob && !isProcessing && (
+                  <Button onClick={handleDownload} variant="secondary" className="w-full">
+                    Download File
+                  </Button>
+                )}
+              </div>
+            </div>
+          </CardContent>
+          
+          {(isProcessing || log.length > 1) && (
+            <>
+              <Separator className="my-4" />
+              <CardContent>
+                <Label>Processing Log</Label>
+                {isProcessing && (
+                  <div className="w-full my-2">
+                    <Progress value={progress} />
+                    <p className="text-sm text-center text-muted-foreground mt-1">{Math.round(progress)}%</p>
+                  </div>
+                )}
+                <div className="mt-2 w-full h-48 bg-slate-100 dark:bg-slate-800 rounded-md p-3">
+                  <pre ref={logContainerRef} className="text-xs font-mono whitespace-pre-wrap h-full overflow-y-auto">
+                    {log.join('\n')}
+                  </pre>
+                </div>
+              </CardContent>
+            </>
+          )}
+
+          <CardFooter className="justify-center">
+            <MadeWithDyad />
+          </CardFooter>
+        </Card>
       </div>
-      <div className="flex items-center gap-4 mb-4">
-        <Select
-          onValueChange={setSelectedTemplate}
-          defaultValue={selectedTemplate}
-          disabled={isProcessing}
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select a template" />
-          </SelectTrigger>
-          <SelectContent>
-            {templates.map((template) => (
-              <SelectItem key={template.name} value={template.name}>
-                {template.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Button
-          onClick={() => selectedFile && processEpub(selectedFile, selectedTemplate)}
-          disabled={!selectedFile || isProcessing}
-        >
-          {isProcessing ? "Processing..." : "Process EPUB"}
-        </Button>
-        {processedBlob && !isProcessing && (
-          <Button onClick={handleDownload} variant="secondary">
-            Download File
-          </Button>
-        )}
-      </div>
-      {isProcessing && (
-        <div className="w-full mb-4">
-          <Progress value={progress} />
-          <p className="text-sm text-center mt-1">{Math.round(progress)}%</p>
-        </div>
-      )}
-      <Textarea
-        value={log}
-        readOnly
-        className="w-full h-64 font-mono text-xs"
-        placeholder="Logs will appear here..."
-      />
     </div>
   );
 }
