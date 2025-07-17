@@ -16,7 +16,12 @@ import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Separator } from "@/components/ui/separator";
 import { ProfileSelector } from "@/components/ProfileSelector";
 import { AnimatedGradientBackground } from "@/components/AnimatedGradientBackground";
-import { DownloadCloud } from "lucide-react";
+import { DownloadCloud, ChevronsUpDown } from "lucide-react";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 export default function Index() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -177,25 +182,33 @@ export default function Index() {
 
           </CardContent>
           
-          {(isProcessing || log.length > 1) && (
-            <>
-              <Separator className="my-4" />
-              <CardContent>
-                <Label>Processing Log</Label>
+          <Separator className="my-4" />
+          <CardContent>
+            <Collapsible>
+              <div className="flex items-center justify-between">
+                <h4 className="text-sm font-semibold">Processing Log</h4>
+                <CollapsibleTrigger asChild>
+                  <Button variant="ghost" size="sm" className="w-9 p-0">
+                    <ChevronsUpDown className="h-4 w-4" />
+                    <span className="sr-only">Toggle Log</span>
+                  </Button>
+                </CollapsibleTrigger>
+              </div>
+              <CollapsibleContent className="pt-2">
                 {isProcessing && (
                   <div className="w-full my-2">
                     <Progress value={progress} />
                     <p className="text-sm text-center text-muted-foreground mt-1">{Math.round(progress)}%</p>
                   </div>
                 )}
-                <div className="mt-2 w-full h-48 bg-slate-100 dark:bg-slate-800 rounded-md p-3">
+                <div className="w-full h-48 bg-slate-100 dark:bg-slate-800 rounded-md p-3">
                   <pre ref={logContainerRef} className="text-xs font-mono whitespace-pre-wrap h-full overflow-y-auto">
                     {log.join('\n')}
                   </pre>
                 </div>
-              </CardContent>
-            </>
-          )}
+              </CollapsibleContent>
+            </Collapsible>
+          </CardContent>
 
           <CardFooter className="justify-center">
             <MadeWithDyad />
