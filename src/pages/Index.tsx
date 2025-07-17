@@ -33,16 +33,39 @@ export default function Index() {
   );
   const [processedBlob, setProcessedBlob] = useState<Blob | null>(null);
   const [processedFilename, setProcessedFilename] = useState<string>("");
+  const [currentProcessingFile, setCurrentProcessingFile] = useState<string>("");
   const logContainerRef = useRef<HTMLPreElement>(null);
 
   const appendLog = useCallback((message: string) => {
     setLog((prevLog) => [...prevLog, message]);
+
+    let filename = "";
+    if (message.includes("Resizing candidate:")) {
+        filename = message.split("Resizing candidate: ")[1].split(" (")[0];
+    } else if (message.includes("Grayscaling candidate:")) {
+        filename = message.split("Grayscaling candidate: ")[1];
+    } else if (message.includes("Adding to zip:")) {
+        filename = message.split("Adding to zip: ")[1].split(" (")[0];
+    } else if (message.includes("Modifying ")) {
+        filename = message.split("Modifying ")[1].replace("...", "");
+    } else if (message.includes("Removing file:")) {
+        filename = message.split("Removing file: ")[1];
+    }
+
+    if (filename) {
+        setCurrentProcessingFile(filename);
+    }
+
+    if (message.startsWith("Processing complete") || message.startsWith("FATAL ERROR")) {
+        setCurrentProcessingFile("");
+    }
   }, []);
 
   const processEpub = useCallback(async (file: File, templateName: string) => {
     setIsProcessing(true);
     setProcessedBlob(null);
     setProcessedFilename("");
+    setCurrentProcessingFile("");
     setLog([`Starting processing with template: ${templateName}...`]);
     setProgress(0);
 
@@ -108,12 +131,12 @@ export default function Index() {
 
   const handleFileChange = (file: File | null) => {
     setSelectedFile(file);
-    // Reset state when file changes
     if (!file) {
       setLog([]);
       setProgress(0);
       setProcessedBlob(null);
       setProcessedFilename("");
+      setCurrentProcessingFile("");
     }
   };
 
@@ -161,15 +184,22 @@ export default function Index() {
               </div>
               <div className="space-y-2">
                 <Label>3. Download your ePUB</Label>
-                <div className="flex items-center justify-center rounded-lg border-2 border-dashed border-gray-300 dark:border-slate-700 p-8 h-[220px]">
+                <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 dark:border-slate-700 p-8 h-[220px]">
                   {selectedFile ? (
-                    <Button
-                      onClick={handleDownload}
-                      disabled={isProcessing || !processedBlob}
-                      className="w-full max-w-xs text-lg py-6"
-                    >
-                      {isProcessing ? "Processing..." : "Download File"}
-                    </Button>
+                    <div className="w-full max-w-xs text-center">
+                      <Button
+                        onClick={handleDownload}
+                        disabled={isProcessing || !processedBlob}
+                        className="w-full text-lg py-6"
+                      >
+                        {isProcessing ? "Processing..." : "Download File"}
+                      </Button>
+                      {isProcessing && currentProcessingFile && (
+                        <p className="mt-2 text-sm text-muted-foreground truncate" title={currentProcessingFile}>
+                          {currentProcessingFile}
+                        </p>
+                      )}
+                    </div>
                   ) : (
                     <div className="flex flex-col items-center gap-2 text-gray-600 dark:text-gray-400">
                       <DownloadCloud className="w-12 h-12 mb-2" />
