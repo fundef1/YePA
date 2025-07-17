@@ -180,7 +180,7 @@ export default function Index() {
                     <Button
                       onClick={handleDownload}
                       disabled={isProcessing || !processedBlob}
-                      className="w-full max-w-xs text-lg py-6"
+                      className="w-full max-w-xs text-lg py-6 truncate"
                     >
                       {isProcessing 
                         ? `Processing ${currentProcessingFile}...` 
