@@ -46,16 +46,9 @@ export const templates: Template[] = [
     grayscaleLevels: 0,
   },
   {
-    name: "Remarkable",
-    description: "Template optimized for Kobo devices.",
-    replacements: [
-      {
-        file: "OEBPS/content.opf",
-        find: /<meta name="book-type" content="comic"\/>\s*/,
-        replace:
-          '<meta name="book-type" content="comic"/>\n<meta name="fixed-layout" content="true"/>\n<meta name="orientation-lock" content="portrait"/>\n',
-      },
-    ],
+    name: "Pass-Through",
+    description: "Unpack and Repack only",
+    replacements: [],
     filesToRemove: [],
     maxWidth: 0,
     maxHeight: 0,
