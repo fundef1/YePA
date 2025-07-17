@@ -10,7 +10,7 @@ import { templates, Template } from "../lib/templates";
 import { resizeImages, grayscaleImages } from "../lib/pipeline";
 import { Header } from "@/components/Header";
 import { FileUploader } from "@/components/FileUploader";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Separator } from "@/components/ui/separator";
@@ -132,10 +132,7 @@ export default function Index() {
       <div className="container mx-auto max-w-3xl">
         <Header />
         <Card className="w-full shadow-lg dark:shadow-black/20">
-          <CardHeader>
-            <CardTitle>Optimization Controls</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-6 pt-6">
             <div className="space-y-2">
               <Label>1. Select an optimization profile</Label>
               <ProfileSelector
