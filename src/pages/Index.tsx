@@ -3,13 +3,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { unzipEpub } from "../lib/unzip";
 import { applyTemplate } from "../lib/template-applier";
 import { zipFileContents } from "../lib/zip";
@@ -21,6 +14,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Label } from "@/components/ui/label";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Separator } from "@/components/ui/separator";
+import { ProfileSelector } from "@/components/ProfileSelector";
 
 export default function Index() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -135,22 +129,12 @@ export default function Index() {
           <CardContent className="space-y-6">
             <div className="space-y-2">
               <Label>1. Select an optimization profile</Label>
-              <Select
+              <ProfileSelector
+                templates={templates}
+                selectedValue={selectedTemplate}
                 onValueChange={setSelectedTemplate}
-                defaultValue={selectedTemplate}
                 disabled={isProcessing}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a template" />
-                </SelectTrigger>
-                <SelectContent>
-                  {templates.map((template) => (
-                    <SelectItem key={template.name} value={template.name}>
-                      {template.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              />
             </div>
             <div className="space-y-2">
               <Label>2. Upload your EPUB</Label>
