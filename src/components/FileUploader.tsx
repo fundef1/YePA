@@ -38,37 +38,36 @@ export const FileUploader: React.FC<FileUploaderProps> = ({ onFileSelect, disabl
     onFileSelect(null);
   };
 
-  if (file) {
-    return (
-      <div className="p-4 rounded-lg border border-dashed border-gray-300 bg-gray-50 dark:bg-slate-800 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <FileIcon className="w-8 h-8 text-primary" />
-          <div>
-            <p className="font-medium text-gray-800 dark:text-gray-200">{file.name}</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
-          </div>
-        </div>
-        <Button variant="ghost" size="icon" onClick={removeFile} disabled={disabled}>
-          <X className="w-5 h-5" />
-        </Button>
-      </div>
-    );
-  }
-
   return (
     <div
       {...getRootProps()}
-      className={`p-8 border-2 border-dashed rounded-lg text-center cursor-pointer transition-colors
-        ${isDragActive ? 'border-primary bg-blue-50 dark:bg-primary/10' : 'border-gray-300 dark:border-slate-700 hover:border-primary'}
-        ${disabled ? 'cursor-not-allowed bg-gray-100 dark:bg-slate-800' : ''}`}
+      className={`p-8 border-2 border-dashed rounded-lg text-center transition-colors flex items-center justify-center min-h-[220px]
+        ${isDragActive ? 'border-primary bg-blue-50 dark:bg-primary/10' : 'border-gray-300 dark:border-slate-700'}
+        ${disabled ? 'cursor-not-allowed bg-gray-100 dark:bg-slate-800' : 'cursor-pointer hover:border-primary'}`}
     >
       <input {...getInputProps()} />
-      <div className="flex flex-col items-center gap-2 text-gray-600 dark:text-gray-400">
-        <UploadCloud className="w-12 h-12 mb-2" />
-        <p className="font-semibold">Drag & drop your .epub file here</p>
-        <p className="text-sm">or</p>
-        <Button type="button" variant="outline" disabled={disabled}>Click to browse</Button>
-      </div>
+      
+      {file ? (
+        <div className="flex items-center justify-between w-full">
+          <div className="flex items-center gap-4 text-left">
+            <FileIcon className="w-12 h-12 text-primary flex-shrink-0" />
+            <div className="overflow-hidden">
+              <p className="font-medium text-gray-800 dark:text-gray-200 truncate" title={file.name}>{file.name}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+            </div>
+          </div>
+          <Button variant="ghost" size="icon" onClick={removeFile} disabled={disabled}>
+            <X className="w-5 h-5" />
+          </Button>
+        </div>
+      ) : (
+        <div className="flex flex-col items-center gap-2 text-gray-600 dark:text-gray-400">
+          <UploadCloud className="w-12 h-12 mb-2" />
+          <p className="font-semibold">Drag & drop your .epub file here</p>
+          <p className="text-sm">or</p>
+          <Button type="button" variant="outline" disabled={disabled}>Click to browse</Button>
+        </div>
+      )}
     </div>
   );
 };
