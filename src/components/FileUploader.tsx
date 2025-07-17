@@ -48,8 +48,8 @@ export const FileUploader: React.FC<FileUploaderProps> = ({ onFileSelect, disabl
       <input {...getInputProps()} />
       
       {file ? (
-        <div className="flex items-center justify-between w-full">
-          <div className="flex items-center gap-4 text-left">
+        <div className="flex items-center justify-between w-full gap-4">
+          <div className="flex items-center gap-4 text-left min-w-0">
             <FileIcon className="w-12 h-12 text-primary flex-shrink-0" />
             <div className="overflow-hidden">
               <p className="font-medium text-gray-800 dark:text-gray-200 truncate" title={file.name}>{file.name}</p>
