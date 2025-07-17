@@ -33,28 +33,16 @@ export default function Index() {
   );
   const [processedBlob, setProcessedBlob] = useState<Blob | null>(null);
   const [processedFilename, setProcessedFilename] = useState<string>("");
-  const [currentProcessingFile, setCurrentProcessingFile] = useState<string>("");
   const logContainerRef = useRef<HTMLPreElement>(null);
 
   const appendLog = useCallback((message: string) => {
     setLog((prevLog) => [...prevLog, message]);
-
-    // Regex to find filenames in log messages from our library functions
-    const fileMatch = message.match(/(?:Modifying|Removing file:|candidate:|Adding to zip:)\s+([\S]+)/);
-    if (fileMatch && fileMatch[1]) {
-      let fullPath = fileMatch[1];
-      // Clean up trailing characters like '...' that might be in the log string
-      fullPath = fullPath.replace(/\.\.\.$/, '');
-      const filename = fullPath.split('/').pop() || fullPath;
-      setCurrentProcessingFile(filename);
-    }
   }, []);
 
   const processEpub = useCallback(async (file: File, templateName: string) => {
     setIsProcessing(true);
     setProcessedBlob(null);
     setProcessedFilename("");
-    setCurrentProcessingFile(""); // Reset at the start of processing
     setLog([`Starting processing with template: ${templateName}...`]);
     setProgress(0);
 
@@ -103,7 +91,6 @@ export default function Index() {
     } finally {
       setIsProcessing(false);
       setProgress(100);
-      setCurrentProcessingFile(""); // Reset at the end
     }
   }, [appendLog]);
 
@@ -127,7 +114,6 @@ export default function Index() {
       setProgress(0);
       setProcessedBlob(null);
       setProcessedFilename("");
-      setCurrentProcessingFile("");
     }
   };
 
@@ -180,11 +166,9 @@ export default function Index() {
                     <Button
                       onClick={handleDownload}
                       disabled={isProcessing || !processedBlob}
-                      className="w-full max-w-xs text-lg py-6 truncate"
+                      className="w-full max-w-xs text-lg py-6"
                     >
-                      {isProcessing 
-                        ? `Processing ${currentProcessingFile}...` 
-                        : "Download File"}
+                      {isProcessing ? "Processing..." : "Download File"}
                     </Button>
                   ) : (
                     <div className="flex flex-col items-center gap-2 text-gray-600 dark:text-gray-400">
