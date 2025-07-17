@@ -6,7 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { unzipEpub } from "../lib/unzip";
 import { applyTemplate } from "../lib/template-applier";
 import { zipFileContents } from "../lib/zip";
-import { templates } from "../lib/templates";
+import { templates, Template } from "../lib/templates";
 import { resizeImages, grayscaleImages } from "../lib/pipeline";
 import { Header } from "@/components/Header";
 import { FileUploader } from "@/components/FileUploader";
@@ -22,8 +22,8 @@ export default function Index() {
   const [log, setLog] = useState<string[]>([]);
   const [progress, setProgress] = useState<number>(0);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
-  const [selectedTemplate, setSelectedTemplate] = useState<string>(
-    templates[0].name
+  const [selectedTemplate, setSelectedTemplate] = useState<Template>(
+    templates[0]
   );
   const [processedBlob, setProcessedBlob] = useState<Blob | null>(null);
   const [processedFilename, setProcessedFilename] = useState<string>("");
@@ -45,6 +45,13 @@ export default function Index() {
     setProgress(0);
     setProcessedBlob(null);
     setProcessedFilename("");
+  };
+
+  const handleTemplateChange = (templateName: string) => {
+    const newTemplate = templates.find((t) => t.name === templateName);
+    if (newTemplate) {
+      setSelectedTemplate(newTemplate);
+    }
   };
 
   const appendLog = (message: string) => {
@@ -121,7 +128,7 @@ export default function Index() {
 
   return (
     <div className="min-h-screen py-8 sm:py-12">
-      <AnimatedGradientBackground />
+      <AnimatedGradientBackground isGrayscale={selectedTemplate.grayscaleLevels > 0} />
       <div className="container mx-auto max-w-3xl">
         <Header />
         <Card className="w-full shadow-lg dark:shadow-black/20">
@@ -133,8 +140,8 @@ export default function Index() {
               <Label>1. Select an optimization profile</Label>
               <ProfileSelector
                 templates={templates}
-                selectedValue={selectedTemplate}
-                onValueChange={setSelectedTemplate}
+                selectedValue={selectedTemplate.name}
+                onValueChange={handleTemplateChange}
                 disabled={isProcessing}
               />
             </div>
@@ -146,7 +153,7 @@ export default function Index() {
               <Label>3. Process and Download</Label>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button
-                  onClick={() => selectedFile && processEpub(selectedFile, selectedTemplate)}
+                  onClick={() => selectedFile && processEpub(selectedFile, selectedTemplate.name)}
                   disabled={!selectedFile || isProcessing}
                   className="w-full"
                 >
