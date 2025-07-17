@@ -46,7 +46,7 @@ export const templates: Template[] = [
     grayscaleLevels: 0,
   },
   {
-    name: "Kobo",
+    name: "Remarkable",
     description: "Template optimized for Kobo devices.",
     replacements: [
       {
