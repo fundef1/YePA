@@ -10,7 +10,7 @@ export const Header = () => {
         </h1>
       </div>
       <p className="text-lg text-muted-foreground">
-        Your friendly neighborhood <span className="font-semibold">ePUB</span> <span className="font-semibold">A</span>ssistant
+        Yet <span className="font-semibold">ePUB</span> Another Processor
       </p>
     </div>
   );
