@@ -134,15 +134,11 @@ export default function Index() {
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
-              <Label>1. Upload your EPUB</Label>
-              <FileUploader onFileSelect={handleFileChange} disabled={isProcessing} />
-            </div>
-            <div className="space-y-2">
-              <Label>2. Select an optimization profile</Label>
+              <Label>1. Select an optimization profile</Label>
               <Select
                 onValueChange={setSelectedTemplate}
                 defaultValue={selectedTemplate}
-                disabled={isProcessing || !selectedFile}
+                disabled={isProcessing}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select a template" />
@@ -155,6 +151,10 @@ export default function Index() {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>2. Upload your EPUB</Label>
+              <FileUploader onFileSelect={handleFileChange} disabled={isProcessing} />
             </div>
             <div className="space-y-2">
               <Label>3. Process and Download</Label>
