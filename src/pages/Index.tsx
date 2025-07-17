@@ -156,7 +156,7 @@ export default function Index() {
               </div>
               <div className="space-y-2">
                 <Label>3. Download your ePUB</Label>
-                <div className="flex items-center justify-center rounded-lg border-2 border-dashed border-gray-300 dark:border-slate-700 p-8 min-h-[220px]">
+                <div className="flex items-center justify-center rounded-lg border-2 border-dashed border-gray-300 dark:border-slate-700 p-8 h-[220px]">
                   {selectedFile ? (
                     <Button
                       onClick={handleDownload}

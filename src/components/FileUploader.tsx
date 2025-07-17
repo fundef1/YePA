@@ -41,7 +41,7 @@ export const FileUploader: React.FC<FileUploaderProps> = ({ onFileSelect, disabl
   return (
     <div
       {...getRootProps()}
-      className={`p-8 border-2 border-dashed rounded-lg text-center transition-colors flex items-center justify-center min-h-[220px]
+      className={`p-8 border-2 border-dashed rounded-lg text-center transition-colors flex items-center justify-center h-[220px]
         ${isDragActive ? 'border-primary bg-blue-50 dark:bg-primary/10' : 'border-gray-300 dark:border-slate-700'}
         ${disabled ? 'cursor-not-allowed bg-gray-100 dark:bg-slate-800' : 'cursor-pointer hover:border-primary'}`}
     >
