@@ -32,17 +32,11 @@ export const templates: Template[] = [
   },
   {
     name: "Remarkable",
-    description: "Standard template for general use.",
-    replacements: [
-      {
-        file: "OEBPS/content.opf",
-        find: /<meta name="book-type" content="comic"\/>\s*/,
-        replace: "",
-      },
-    ],
+    description: "Remarkable image resizing (1404x1872) and 256-level grayscale",
+    replacements: [],
     filesToRemove: [],
-    maxWidth: 0,
-    maxHeight: 0,
+    maxWidth: 1404,
+    maxHeight: 1872,
     grayscaleLevels: 1024,
   },
   {
