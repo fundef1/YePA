@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Separator } from "@/components/ui/separator";
 import { ProfileSelector } from "@/components/ProfileSelector";
+import { AnimatedGradientBackground } from "@/components/AnimatedGradientBackground";
 
 export default function Index() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -119,7 +120,8 @@ export default function Index() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 py-8 sm:py-12">
+    <div className="min-h-screen py-8 sm:py-12">
+      <AnimatedGradientBackground />
       <div className="container mx-auto max-w-3xl">
         <Header />
         <Card className="w-full shadow-lg dark:shadow-black/20">
