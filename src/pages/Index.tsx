@@ -39,22 +39,20 @@ export default function Index() {
   const appendLog = useCallback((message: string) => {
     setLog((prevLog) => [...prevLog, message]);
 
-    let fullPath = "";
+    let filename = "";
     if (message.includes("Resizing candidate:")) {
-        fullPath = message.split("Resizing candidate: ")[1].split(" (")[0];
+        filename = message.split("Resizing candidate: ")[1].split(" (")[0];
     } else if (message.includes("Grayscaling candidate:")) {
-        fullPath = message.split("Grayscaling candidate: ")[1];
+        filename = message.split("Grayscaling candidate: ")[1];
     } else if (message.includes("Adding to zip:")) {
-        fullPath = message.split("Adding to zip: ")[1].split(" (")[0];
+        filename = message.split("Adding to zip: ")[1].split(" (")[0];
     } else if (message.includes("Modifying ")) {
-        fullPath = message.split("Modifying ")[1].replace("...", "");
+        filename = message.split("Modifying ")[1].replace("...", "");
     } else if (message.includes("Removing file:")) {
-        fullPath = message.split("Removing file: ")[1];
+        filename = message.split("Removing file: ")[1];
     }
 
-    if (fullPath) {
-        const pathParts = fullPath.split('/');
-        const filename = pathParts[pathParts.length - 1];
+    if (filename) {
         setCurrentProcessingFile(filename);
     }
 
@@ -181,7 +179,7 @@ export default function Index() {
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label>2. Upload your EPUB</Label>
+                <Label>2. Upload your ePUB</Label>
                 <FileUploader onFileSelect={handleFileChange} disabled={isProcessing} />
               </div>
               <div className="space-y-2">
@@ -196,9 +194,11 @@ export default function Index() {
                       >
                         {isProcessing ? "Processing..." : "Download File"}
                       </Button>
-                      <p className="mt-2 text-sm text-muted-foreground truncate h-5" title={currentProcessingFile || undefined}>
-                        {isProcessing && currentProcessingFile ? currentProcessingFile : <>&nbsp;</>}
-                      </p>
+                      {isProcessing && currentProcessingFile && (
+                        <p className="mt-2 text-sm text-muted-foreground truncate" title={currentProcessingFile}>
+                          {currentProcessingFile}
+                        </p>
+                      )}
                     </div>
                   ) : (
                     <div className="flex flex-col items-center gap-2 text-gray-600 dark:text-gray-400">
