@@ -37,7 +37,7 @@ export const templates: Template[] = [
     filesToRemove: [],
     maxWidth: 1404,
     maxHeight: 1872,
-    grayscaleLevels: 1024,
+    grayscaleLevels: 256,
   },
   {
     name: "Pass-Through",
