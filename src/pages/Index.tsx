@@ -15,7 +15,7 @@ import { unzipEpub } from "../lib/unzip";
 import { applyTemplate } from "../lib/template-applier";
 import { zipFileContents } from "../lib/zip";
 import { templates } from "../lib/templates";
-import { resizeImages, grayscaleImages } from "../lib/resize";
+import { resizeImages, grayscaleImages } from "../lib/pipeline";
 
 export default function Index() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
