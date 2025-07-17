@@ -31,7 +31,7 @@ export const templates: Template[] = [
     grayscaleLevels: 16,
   },
   {
-    name: "ST",
+    name: "Remarkable",
     description: "Standard template for general use.",
     replacements: [
       {
