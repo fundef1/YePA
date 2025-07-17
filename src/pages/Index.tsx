@@ -16,6 +16,7 @@ import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Separator } from "@/components/ui/separator";
 import { ProfileSelector } from "@/components/ProfileSelector";
 import { AnimatedGradientBackground } from "@/components/AnimatedGradientBackground";
+import { DownloadCloud } from "lucide-react";
 
 export default function Index() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -134,7 +135,7 @@ export default function Index() {
   return (
     <div className="min-h-screen py-8 sm:py-12">
       <AnimatedGradientBackground isGrayscale={selectedTemplate.grayscaleLevels > 0} />
-      <div className="container mx-auto max-w-3xl">
+      <div className="container mx-auto max-w-5xl">
         <Header />
         <Card className="w-full shadow-lg dark:shadow-black/20">
           <CardContent className="space-y-6 pt-6">
@@ -147,24 +148,33 @@ export default function Index() {
                 disabled={isProcessing}
               />
             </div>
-            <div className="space-y-2">
-              <Label>2. Upload your EPUB</Label>
-              <FileUploader onFileSelect={handleFileChange} disabled={isProcessing} />
-            </div>
-            <div className="space-y-2">
-              <Label>3. Download your ePUB</Label>
-              <div className="flex flex-col sm:flex-row gap-4 min-h-[40px]">
-                {selectedFile && (
-                  <Button
-                    onClick={handleDownload}
-                    disabled={isProcessing || !processedBlob}
-                    className="w-full"
-                  >
-                    {isProcessing ? "Processing..." : "Download File"}
-                  </Button>
-                )}
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label>2. Upload your EPUB</Label>
+                <FileUploader onFileSelect={handleFileChange} disabled={isProcessing} />
+              </div>
+              <div className="space-y-2">
+                <Label>3. Download your ePUB</Label>
+                <div className="flex items-center justify-center rounded-lg border-2 border-dashed border-gray-300 dark:border-slate-700 p-8 min-h-[220px]">
+                  {selectedFile ? (
+                    <Button
+                      onClick={handleDownload}
+                      disabled={isProcessing || !processedBlob}
+                      className="w-full max-w-xs text-lg py-6"
+                    >
+                      {isProcessing ? "Processing..." : "Download File"}
+                    </Button>
+                  ) : (
+                    <div className="flex flex-col items-center gap-2 text-gray-600 dark:text-gray-400">
+                      <DownloadCloud className="w-12 h-12 mb-2" />
+                      <p className="font-semibold text-center">Upload a file to enable download</p>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
+
           </CardContent>
           
           {(isProcessing || log.length > 1) && (
