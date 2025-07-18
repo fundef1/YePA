@@ -13,12 +13,14 @@ const icons: IconDefinition[] = [
   faFileImage, faFileCode, faFileExport, faFileImport
 ];
 
-// A palette that works well with the gradient background, using low opacity
+// A more vibrant and visible color palette with increased opacity
 const colors = [
-  'rgba(255, 255, 255, 0.07)',
-  'rgba(233, 213, 255, 0.07)',
-  'rgba(199, 210, 254, 0.07)',
-  'rgba(186, 230, 253, 0.07)',
+  'rgba(168, 85, 247, 0.2)',   // Vibrant Purple
+  'rgba(244, 114, 182, 0.2)',  // Vibrant Pink
+  'rgba(59, 130, 246, 0.2)',   // Vibrant Blue
+  'rgba(34, 211, 238, 0.2)',   // Vibrant Cyan
+  'rgba(236, 72, 153, 0.2)',   // Another Pink
+  'rgba(139, 92, 246, 0.2)',   // Another Purple
 ];
 
 interface IconStyle {
@@ -35,9 +37,10 @@ const generateRandomIcons = (count: number): IconStyle[] => {
         position: 'absolute',
         top: `${Math.random() * 100}%`,
         left: `${Math.random() * 100}%`,
-        fontSize: `${Math.floor(Math.random() * 40 + 20)}px`, // 20px to 60px
+        fontSize: `${Math.floor(Math.random() * 50 + 25)}px`, // 25px to 75px
         color: colors[Math.floor(Math.random() * colors.length)],
         transform: `rotate(${Math.floor(Math.random() * 360)}deg)`,
+        transition: 'color 0.5s ease-in-out',
       },
     });
   }
@@ -48,8 +51,8 @@ export const IconBackground = () => {
   const [randomIcons, setRandomIcons] = useState<IconStyle[]>([]);
 
   useEffect(() => {
-    // Generate around 40 icons for a subtle effect
-    setRandomIcons(generateRandomIcons(40));
+    // Generate 50 icons for a denser, more visible effect
+    setRandomIcons(generateRandomIcons(50));
   }, []);
 
   return (
