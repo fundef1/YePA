@@ -189,7 +189,11 @@ export default function Index() {
       />
       <AnimatedGradientBackground isGrayscale={selectedTemplate.grayscaleLevels > 0} />
       <div className="container mx-auto max-w-5xl">
-        <Header isColorful={selectedTemplate.grayscaleLevels > 0} />
+        <Header 
+          isColorful={selectedTemplate.grayscaleLevels > 0}
+          maxWidth={selectedTemplate.maxWidth}
+          maxHeight={selectedTemplate.maxHeight}
+        />
         <Card className="w-full shadow-lg dark:shadow-black/20">
           <CardContent className="space-y-6 pt-6">
             <div className="space-y-2">
