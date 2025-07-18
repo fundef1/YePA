@@ -3,7 +3,10 @@ import dyadComponentTagger from "@dyad-sh/react-vite-component-tagger";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
-export default defineConfig(() => ({
+export default defineConfig(({ command }) => ({
+  // Set the base path for GitHub Pages.
+  // Change '/yepa/' to your repository name if it's different.
+  base: command === 'build' ? '/yepa/' : '/',
   server: {
     host: "::",
     port: 8080,
