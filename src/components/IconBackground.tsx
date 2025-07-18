@@ -53,32 +53,46 @@ interface IconBackgroundProps {
 
 export const IconBackground = ({ maxWidth, maxHeight }: IconBackgroundProps) => {
   const [randomIcons, setRandomIcons] = useState<IconStyle[]>([]);
-  const filterId = "pixelate-filter";
+  const filterId = "pixelate-filter-advanced";
 
   const pixelationAmount = useMemo(() => {
     if (maxWidth === 0 || maxHeight === 0) {
-      return { x: 0, y: 0 };
+      return { width: 0, height: 0 };
     }
-    // Inverse correlation based on user's examples:
-    // 600px width -> 6px pixelation, 1200px -> 3px. Constant = 3600.
-    const x = Math.max(0, 3600 / maxWidth - 1);
-    const y = Math.max(0, 3600 / maxHeight - 1);
-    return { x, y };
+    // Inverse correlation from user's examples:
+    // 600px width -> 6px pixelation. 600 * 6 = 3600
+    const width = 3600 / maxWidth;
+    // 800px height -> 8px pixelation. 800 * 8 = 6400
+    const height = 6400 / maxHeight;
+
+    return { width, height };
   }, [maxWidth, maxHeight]);
 
   useEffect(() => {
     setRandomIcons(generateRandomIcons(50));
   }, []);
 
-  const shouldUseFilter = pixelationAmount.x > 0 && pixelationAmount.y > 0;
+  const { width: pixelWidth, height: pixelHeight } = pixelationAmount;
+  const shouldUseFilter = pixelWidth > 0 && pixelHeight > 0;
 
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden" aria-hidden="true">
       <svg style={{ position: 'absolute', width: 0, height: 0 }}>
         <defs>
-          <filter id={filterId}>
-            <feMorphology operator="dilate" radius={`${pixelationAmount.x} ${pixelationAmount.y}`} />
-          </filter>
+          {shouldUseFilter && (
+            <filter id={filterId}>
+              {/* 1. Create a grid by tiling a small dot */}
+              <feFlood x={pixelWidth / 2} y={pixelHeight / 2} height="1" width="1" />
+              <feComposite width={pixelWidth} height={pixelHeight} />
+              <feTile result="a" />
+              
+              {/* 2. Use the grid to sample the source graphic */}
+              <feComposite in="SourceGraphic" in2="a" operator="in" />
+              
+              {/* 3. Dilate the samples to fill the grid cells, creating pixels */}
+              <feMorphology operator="dilate" radius={`${pixelWidth / 2} ${pixelHeight / 2}`} />
+            </filter>
+          )}
         </defs>
       </svg>
       {randomIcons.map((item, index) => (
