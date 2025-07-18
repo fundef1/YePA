@@ -5,7 +5,7 @@ import path from "path";
 
 export default defineConfig(({ command }) => ({
   // Set the base path for GitHub Pages.
-  // Change '/yepa/' to your repository name if it's different.
+  // This must match your repository name exactly.
   base: command === 'build' ? '/YePA/' : '/',
   server: {
     host: "::",
