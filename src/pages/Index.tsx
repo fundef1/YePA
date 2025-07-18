@@ -12,7 +12,7 @@ import { Header } from "@/components/Header";
 import { FileUploader } from "@/components/FileUploader";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { MadeWithDyad } from "@/components/made-with-dyad";
+import { FooterAttribution } from "@/components/FooterAttribution";
 import { Separator } from "@/components/ui/separator";
 import { ProfileSelector } from "@/components/ProfileSelector";
 import { AnimatedGradientBackground } from "@/components/AnimatedGradientBackground";
@@ -273,7 +273,7 @@ export default function Index() {
           </CardContent>
 
           <CardFooter className="justify-center">
-            <MadeWithDyad />
+            <FooterAttribution />
           </CardFooter>
         </Card>
       </div>
