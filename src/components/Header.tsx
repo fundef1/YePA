@@ -11,7 +11,7 @@ export const Header = ({ isColorful }: HeaderProps) => {
       <div className="flex items-center justify-center gap-3 mb-2">
         <BookOpen className={cn(
           "w-10 h-10 transition-colors duration-500",
-          isColorful ? "text-pink-500" : "text-gray-500"
+          isColorful ? "text-pink-500" : "text-gray-800 dark:text-gray-200"
         )} />
         <h1 className={cn(
           "text-5xl font-bold tracking-tight",
