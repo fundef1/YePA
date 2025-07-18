@@ -31,6 +31,16 @@ export const templates: Template[] = [
     grayscaleLevels: 16,
   },
   {
+    name: "Kobo",
+    description: "Kobo image resizing (1404x1872) and 256-level grayscale",
+    replacements: [],
+    filesToRemove: [],
+    maxWidth: 1404,
+    maxHeight: 1872,
+    grayscaleLevels: 256,
+  },
+  
+  {
     name: "Remarkable",
     description: "Remarkable image resizing (1404x1872) and 256-level grayscale",
     replacements: [],
