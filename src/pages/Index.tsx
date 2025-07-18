@@ -215,17 +215,20 @@ export default function Index() {
                 <Label>3. Download your ePUB</Label>
                 <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 dark:border-slate-700 p-8 h-[220px]">
                   {selectedFile ? (
-                    <div className="w-full max-w-xs text-center">
-                      <Button
-                        onClick={handleDownload}
-                        disabled={isProcessing || !processedBlob}
-                        className="w-full text-lg py-6"
-                      >
-                        {isProcessing ? "Processing..." : "Download File"}
-                      </Button>
-                      <p className="mt-2 text-sm text-muted-foreground truncate h-5" title={currentProcessingFile || undefined}>
-                        {isProcessing && currentProcessingFile ? currentProcessingFile : <>&nbsp;</>}
-                      </p>
+                    <div className="flex flex-col items-center gap-4 text-center">
+                      <DownloadCloud className="w-12 h-12 text-primary" />
+                      <div className="w-full max-w-xs">
+                        <Button
+                          onClick={handleDownload}
+                          disabled={isProcessing || !processedBlob}
+                          className="w-full text-lg py-6"
+                        >
+                          {isProcessing ? "Processing..." : "Download File"}
+                        </Button>
+                        <p className="mt-2 text-sm text-muted-foreground truncate h-5" title={currentProcessingFile || undefined}>
+                          {isProcessing && currentProcessingFile ? currentProcessingFile : <>&nbsp;</>}
+                        </p>
+                      </div>
                     </div>
                   ) : (
                     <div className="flex flex-col items-center gap-2 text-gray-600 dark:text-gray-400">
