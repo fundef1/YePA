@@ -36,7 +36,7 @@ const generateRandomIcons = (count: number): IconStyle[] => {
         position: 'absolute',
         top: `${Math.random() * 100}%`,
         left: `${Math.random() * 100}%`,
-        fontSize: `${Math.floor(Math.random() * 50 + 25)}px`,
+        fontSize: `${Math.floor(Math.random() * 100 + 50)}px`,
         color: colors[Math.floor(Math.random() * colors.length)],
         transform: `rotate(${Math.floor(Math.random() * 360)}deg)`,
         transition: 'filter 0.5s ease-in-out, color 0.5s ease-in-out',
