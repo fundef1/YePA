@@ -234,6 +234,8 @@ export default function Index() {
                     <div className="flex flex-col items-center gap-2 text-gray-600 dark:text-gray-400">
                       <DownloadCloud className="w-12 h-12 mb-2" />
                       <p className="font-semibold text-center">Upload a file to enable download</p>
+                      <p className="text-sm">then</p>
+                      <Button type="button" variant="outline" disabled>Download File</Button>
                     </div>
                   )}
                 </div>
