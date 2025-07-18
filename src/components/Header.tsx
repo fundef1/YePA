@@ -11,7 +11,7 @@ export const Header = ({ isColorful }: HeaderProps) => {
       <div className="flex items-center justify-center gap-3 mb-2">
         <BookOpen className={cn(
           "w-10 h-10 transition-colors duration-500",
-          isColorful ? "text-primary" : "text-gray-500"
+          isColorful ? "text-pink-500" : "text-gray-500"
         )} />
         <h1 className={cn(
           "text-5xl font-bold tracking-tight",
@@ -22,7 +22,10 @@ export const Header = ({ isColorful }: HeaderProps) => {
           YePA
         </h1>
       </div>
-      <p className="text-lg text-muted-foreground">
+      <p className={cn(
+        "text-lg transition-colors duration-500",
+        isColorful ? "text-pink-500" : "text-muted-foreground"
+      )}>
         Yet <span className="font-semibold">ePUB</span> Another Processor
       </p>
     </div>
