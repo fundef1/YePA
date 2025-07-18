@@ -77,7 +77,7 @@ const resizeImageBlob = (
 };
 
 /**
- * Iterates through file entries and resizes images that meet the criteria.
+ * Iterates through file entries and resizes images that meet the criteria in parallel.
  * @returns A promise that resolves to the new array of entries with resized images.
  */
 export const resizeImages = async (
@@ -94,38 +94,52 @@ export const resizeImages = async (
   }
 
   appendLog(`Resizing images to fit within ${maxWidth}x${maxHeight}...`);
-  const newEntries: ImageEntry[] = [];
-  const totalEntries = entries.length;
-  let processedCount = 0;
-
-  for (const entry of entries) {
+  
+  const imageEntriesToProcess = entries.filter(entry => {
     const fileExtension = entry.filename.toLowerCase().substring(entry.filename.lastIndexOf("."));
+    return RESIZABLE_EXTENSIONS.has(fileExtension) && entry.data.size > IMAGE_MIN_SIZE_BYTES;
+  });
 
-    if (RESIZABLE_EXTENSIONS.has(fileExtension) && entry.data.size > IMAGE_MIN_SIZE_BYTES) {
-      try {
-        appendLog(`Resizing candidate: ${entry.filename} (${(entry.data.size / 1024).toFixed(1)} KB)`);
-        const resizedBlob = await resizeImageBlob(entry.data, entry.filename, maxWidth, maxHeight);
-        if (resizedBlob.size < entry.data.size) {
-          appendLog(` -> Resized to ${(resizedBlob.size / 1024).toFixed(1)} KB`);
-          newEntries.push({ ...entry, data: resizedBlob });
-        } else {
-          appendLog(` -> Skipped (resized version not smaller)`);
-          newEntries.push(entry);
-        }
-      } catch (error) {
-        const msg = error instanceof Error ? error.message : String(error);
-        appendLog(`Error resizing ${entry.filename}: ${msg}. Keeping original.`);
-        newEntries.push(entry);
-      }
-    } else {
-      newEntries.push(entry);
-    }
-    processedCount++;
-    setProgress((processedCount / totalEntries) * 100);
+  if (imageEntriesToProcess.length === 0) {
+    appendLog("No images to resize.");
+    setProgress(100);
+    return entries;
   }
 
+  const otherEntries = entries.filter(entry => !imageEntriesToProcess.includes(entry));
+  
+  let processedCount = 0;
+  const totalToProcess = imageEntriesToProcess.length;
+  const updateProgress = () => {
+    processedCount++;
+    setProgress((processedCount / totalToProcess) * 100);
+  };
+
+  const processingPromises = imageEntriesToProcess.map(async (entry) => {
+    try {
+      appendLog(`Resizing candidate: ${entry.filename} (${(entry.data.size / 1024).toFixed(1)} KB)`);
+      const resizedBlob = await resizeImageBlob(entry.data, entry.filename, maxWidth, maxHeight);
+      if (resizedBlob.size < entry.data.size) {
+        appendLog(` -> Resized to ${(resizedBlob.size / 1024).toFixed(1)} KB`);
+        updateProgress();
+        return { ...entry, data: resizedBlob };
+      } else {
+        appendLog(` -> Skipped (resized version not smaller)`);
+        updateProgress();
+        return entry;
+      }
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      appendLog(`Error resizing ${entry.filename}: ${msg}. Keeping original.`);
+      updateProgress();
+      return entry;
+    }
+  });
+
+  const resizedImages = await Promise.all(processingPromises);
+
   appendLog("Image resizing complete.");
-  return newEntries;
+  return [...resizedImages, ...otherEntries];
 };
 
 /**
@@ -189,7 +203,7 @@ const grayscaleImageBlob = (
 };
 
 /**
- * Iterates through file entries and converts images to grayscale.
+ * Iterates through file entries and converts images to grayscale in parallel.
  * @returns A promise that resolves to the new array of entries with grayscaled images.
  */
 export const grayscaleImages = async (
@@ -205,31 +219,44 @@ export const grayscaleImages = async (
   }
 
   appendLog(`Converting images to ${levels} levels of gray...`);
-  const newEntries: ImageEntry[] = [];
-  const totalEntries = entries.length;
-  let processedCount = 0;
-
-  for (const entry of entries) {
+  
+  const imageEntriesToProcess = entries.filter(entry => {
     const fileExtension = entry.filename.toLowerCase().substring(entry.filename.lastIndexOf("."));
+    return RESIZABLE_EXTENSIONS.has(fileExtension);
+  });
 
-    if (RESIZABLE_EXTENSIONS.has(fileExtension)) {
-      try {
-        appendLog(`Grayscaling candidate: ${entry.filename}`);
-        const grayscaledBlob = await grayscaleImageBlob(entry.data, entry.filename, levels);
-        appendLog(` -> Grayscaled successfully.`);
-        newEntries.push({ ...entry, data: grayscaledBlob });
-      } catch (error) {
-        const msg = error instanceof Error ? error.message : String(error);
-        appendLog(`Error grayscaling ${entry.filename}: ${msg}. Keeping original.`);
-        newEntries.push(entry);
-      }
-    } else {
-      newEntries.push(entry);
-    }
-    processedCount++;
-    setProgress((processedCount / totalEntries) * 100);
+  if (imageEntriesToProcess.length === 0) {
+    appendLog("No images to convert to grayscale.");
+    setProgress(100);
+    return entries;
   }
 
+  const otherEntries = entries.filter(entry => !imageEntriesToProcess.includes(entry));
+
+  let processedCount = 0;
+  const totalToProcess = imageEntriesToProcess.length;
+  const updateProgress = () => {
+    processedCount++;
+    setProgress((processedCount / totalToProcess) * 100);
+  };
+
+  const processingPromises = imageEntriesToProcess.map(async (entry) => {
+    try {
+      appendLog(`Grayscaling candidate: ${entry.filename}`);
+      const grayscaledBlob = await grayscaleImageBlob(entry.data, entry.filename, levels);
+      appendLog(` -> Grayscaled successfully.`);
+      updateProgress();
+      return { ...entry, data: grayscaledBlob };
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      appendLog(`Error grayscaling ${entry.filename}: ${msg}. Keeping original.`);
+      updateProgress();
+      return entry;
+    }
+  });
+
+  const grayscaledImages = await Promise.all(processingPromises);
+
   appendLog("Grayscale conversion complete.");
-  return newEntries;
+  return [...grayscaledImages, ...otherEntries];
 };
