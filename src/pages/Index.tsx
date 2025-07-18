@@ -23,15 +23,31 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { IconBackground } from "@/components/IconBackground";
+import { getCookie, setCookie } from "../lib/cookies";
+
+const PROFILE_COOKIE_NAME = "yepa_profile";
 
 export default function Index() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [log, setLog] = useState<string[]>([]);
   const [progress, setProgress] = useState<number>(0);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
-  const [selectedTemplate, setSelectedTemplate] = useState<Template>(
-    templates[0]
-  );
+  const [selectedTemplate, setSelectedTemplate] = useState<Template>(() => {
+    const savedProfileName = getCookie(PROFILE_COOKIE_NAME);
+    const passThroughTemplate = templates.find(t => t.name === "Pass-Through");
+
+    if (!passThroughTemplate) {
+      console.error("Default 'Pass-Through' template not found!");
+      return templates[0];
+    }
+
+    if (savedProfileName) {
+      const savedTemplate = templates.find(t => t.name === savedProfileName);
+      return savedTemplate || passThroughTemplate;
+    }
+    
+    return passThroughTemplate;
+  });
   const [processedBlob, setProcessedBlob] = useState<Blob | null>(null);
   const [processedFilename, setProcessedFilename] = useState<string>("");
   const [currentProcessingFile, setCurrentProcessingFile] = useState<string>("");
@@ -147,6 +163,7 @@ export default function Index() {
     const newTemplate = templates.find((t) => t.name === templateName);
     if (newTemplate) {
       setSelectedTemplate(newTemplate);
+      setCookie(PROFILE_COOKIE_NAME, newTemplate.name, 365);
     }
   };
 
@@ -176,7 +193,7 @@ export default function Index() {
         <Card className="w-full shadow-lg dark:shadow-black/20">
           <CardContent className="space-y-6 pt-6">
             <div className="space-y-2">
-              <Label>1. Select your eReader</Label>
+              <Label>1. Select an optimization profile</Label>
               <ProfileSelector
                 templates={templates}
                 selectedValue={selectedTemplate.name}
@@ -209,7 +226,7 @@ export default function Index() {
                   ) : (
                     <div className="flex flex-col items-center gap-2 text-gray-600 dark:text-gray-400">
                       <DownloadCloud className="w-12 h-12 mb-2" />
-                      <p className="font-semibold text-center">Upload an ePUB first</p>
+                      <p className="font-semibold text-center">Upload a file to enable download</p>
                     </div>
                   )}
                 </div>
