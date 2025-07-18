@@ -9,24 +9,40 @@ interface HeaderProps {
 }
 
 export const Header = ({ isColorful, maxWidth, maxHeight }: HeaderProps) => {
-  const filterId = "pixelate-filter-advanced";
+  const headerFilterId = "pixelate-filter-header";
 
   const pixelationAmount = useMemo(() => {
     if (maxWidth === 0 || maxHeight === 0) {
       return { width: 0, height: 0 };
     }
-    const width = 3600 / maxWidth;
-    const height = 6400 / maxHeight;
+    // Calculate pixelation for the title at half strength
+    const width = (3600 / maxWidth) / 2;
+    const height = (6400 / maxHeight) / 2;
     return { width, height };
   }, [maxWidth, maxHeight]);
 
-  const { width: pixelWidth, height: pixelHeight } = pixelationAmount;
-  const shouldUsePixelateFilter = pixelWidth > 0 && pixelHeight > 0;
+  const { width: titlePixelWidth, height: titlePixelHeight } = pixelationAmount;
+  const shouldUsePixelateFilter = titlePixelWidth > 0 && titlePixelHeight > 0;
 
-  const titleFilterValue = shouldUsePixelateFilter ? `url(#${filterId})` : 'none';
+  const titleFilterValue = shouldUsePixelateFilter ? `url(#${headerFilterId})` : 'none';
 
   return (
     <div className="text-center mb-8">
+      {/* Define the SVG filter specifically for the header */}
+      <svg style={{ position: 'absolute', width: 0, height: 0 }}>
+        <defs>
+          {shouldUsePixelateFilter && (
+            <filter id={headerFilterId}>
+              <feFlood x={titlePixelWidth / 2} y={titlePixelHeight / 2} height="1" width="1" />
+              <feComposite width={titlePixelWidth} height={titlePixelHeight} />
+              <feTile result="a" />
+              <feComposite in="SourceGraphic" in2="a" operator="in" />
+              <feMorphology operator="dilate" radius={`${titlePixelWidth / 2} ${titlePixelHeight / 2}`} />
+            </filter>
+          )}
+        </defs>
+      </svg>
+
       <div className="flex items-center justify-center gap-3 mb-2">
         <BookOpen className={cn(
           "w-10 h-10 transition-all duration-500",
