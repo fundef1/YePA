@@ -49,9 +49,10 @@ const generateRandomIcons = (count: number): IconStyle[] => {
 interface IconBackgroundProps {
   maxWidth: number;
   maxHeight: number;
+  isGrayscale: boolean;
 }
 
-export const IconBackground = ({ maxWidth, maxHeight }: IconBackgroundProps) => {
+export const IconBackground = ({ maxWidth, maxHeight, isGrayscale }: IconBackgroundProps) => {
   const [randomIcons, setRandomIcons] = useState<IconStyle[]>([]);
   const filterId = "pixelate-filter-advanced";
 
@@ -59,12 +60,8 @@ export const IconBackground = ({ maxWidth, maxHeight }: IconBackgroundProps) => 
     if (maxWidth === 0 || maxHeight === 0) {
       return { width: 0, height: 0 };
     }
-    // Inverse correlation from user's examples:
-    // 600px width -> 6px pixelation. 600 * 6 = 3600
     const width = 3600 / maxWidth;
-    // 800px height -> 8px pixelation. 800 * 8 = 6400
     const height = 6400 / maxHeight;
-
     return { width, height };
   }, [maxWidth, maxHeight]);
 
@@ -73,23 +70,23 @@ export const IconBackground = ({ maxWidth, maxHeight }: IconBackgroundProps) => 
   }, []);
 
   const { width: pixelWidth, height: pixelHeight } = pixelationAmount;
-  const shouldUseFilter = pixelWidth > 0 && pixelHeight > 0;
+  const shouldUsePixelateFilter = pixelWidth > 0 && pixelHeight > 0;
+
+  const filterValue = [
+    isGrayscale ? 'grayscale(1)' : '',
+    shouldUsePixelateFilter ? `url(#${filterId})` : ''
+  ].filter(Boolean).join(' ');
 
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden" aria-hidden="true">
       <svg style={{ position: 'absolute', width: 0, height: 0 }}>
         <defs>
-          {shouldUseFilter && (
+          {shouldUsePixelateFilter && (
             <filter id={filterId}>
-              {/* 1. Create a grid by tiling a small dot */}
               <feFlood x={pixelWidth / 2} y={pixelHeight / 2} height="1" width="1" />
               <feComposite width={pixelWidth} height={pixelHeight} />
               <feTile result="a" />
-              
-              {/* 2. Use the grid to sample the source graphic */}
               <feComposite in="SourceGraphic" in2="a" operator="in" />
-              
-              {/* 3. Dilate the samples to fill the grid cells, creating pixels */}
               <feMorphology operator="dilate" radius={`${pixelWidth / 2} ${pixelHeight / 2}`} />
             </filter>
           )}
@@ -101,7 +98,7 @@ export const IconBackground = ({ maxWidth, maxHeight }: IconBackgroundProps) => 
           icon={item.icon}
           style={{
             ...item.style,
-            filter: shouldUseFilter ? `url(#${filterId})` : 'none',
+            filter: filterValue || 'none',
           }}
         />
       ))}

@@ -168,6 +168,7 @@ export default function Index() {
       <IconBackground
         maxWidth={selectedTemplate.maxWidth}
         maxHeight={selectedTemplate.maxHeight}
+        isGrayscale={selectedTemplate.grayscaleLevels > 0}
       />
       <AnimatedGradientBackground isGrayscale={selectedTemplate.grayscaleLevels > 0} />
       <div className="container mx-auto max-w-5xl">
