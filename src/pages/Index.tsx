@@ -22,6 +22,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { IconBackground } from "@/components/IconBackground";
 
 export default function Index() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -39,20 +40,22 @@ export default function Index() {
   const appendLog = useCallback((message: string) => {
     setLog((prevLog) => [...prevLog, message]);
 
-    let filename = "";
+    let fullPath = "";
     if (message.includes("Resizing candidate:")) {
-        filename = message.split("Resizing candidate: ")[1].split(" (")[0];
+        fullPath = message.split("Resizing candidate: ")[1].split(" (")[0];
     } else if (message.includes("Grayscaling candidate:")) {
-        filename = message.split("Grayscaling candidate: ")[1];
+        fullPath = message.split("Grayscaling candidate: ")[1];
     } else if (message.includes("Adding to zip:")) {
-        filename = message.split("Adding to zip: ")[1].split(" (")[0];
+        fullPath = message.split("Adding to zip: ")[1].split(" (")[0];
     } else if (message.includes("Modifying ")) {
-        filename = message.split("Modifying ")[1].replace("...", "");
+        fullPath = message.split("Modifying ")[1].replace("...", "");
     } else if (message.includes("Removing file:")) {
-        filename = message.split("Removing file: ")[1];
+        fullPath = message.split("Removing file: ")[1];
     }
 
-    if (filename) {
+    if (fullPath) {
+        const pathParts = fullPath.split('/');
+        const filename = pathParts[pathParts.length - 1];
         setCurrentProcessingFile(filename);
     }
 
@@ -162,6 +165,7 @@ export default function Index() {
 
   return (
     <div className="min-h-screen py-8 sm:py-12">
+      <IconBackground />
       <AnimatedGradientBackground isGrayscale={selectedTemplate.grayscaleLevels > 0} />
       <div className="container mx-auto max-w-5xl">
         <Header />
@@ -179,7 +183,7 @@ export default function Index() {
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label>2. Upload your ePUB</Label>
+                <Label>2. Upload your EPUB</Label>
                 <FileUploader onFileSelect={handleFileChange} disabled={isProcessing} />
               </div>
               <div className="space-y-2">
@@ -194,11 +198,9 @@ export default function Index() {
                       >
                         {isProcessing ? "Processing..." : "Download File"}
                       </Button>
-                      {isProcessing && currentProcessingFile && (
-                        <p className="mt-2 text-sm text-muted-foreground truncate" title={currentProcessingFile}>
-                          {currentProcessingFile}
-                        </p>
-                      )}
+                      <p className="mt-2 text-sm text-muted-foreground truncate h-5" title={currentProcessingFile || undefined}>
+                        {isProcessing && currentProcessingFile ? currentProcessingFile : <>&nbsp;</>}
+                      </p>
                     </div>
                   ) : (
                     <div className="flex flex-col items-center gap-2 text-gray-600 dark:text-gray-400">
