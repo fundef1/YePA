@@ -48,15 +48,16 @@ export const FileUploader: React.FC<FileUploaderProps> = ({ onFileSelect, disabl
       <input {...getInputProps()} />
       
       {file ? (
-        <div className="flex flex-col items-center justify-center w-full gap-3 text-center">
-          <FileIcon className="w-12 h-12 text-primary" />
-          <div className="max-w-full overflow-hidden">
-            <p className="font-medium text-gray-800 dark:text-gray-200 truncate" title={file.name}>{file.name}</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+        <div className="flex items-center justify-between w-full gap-4">
+          <div className="flex items-center gap-4 text-left min-w-0">
+            <FileIcon className="w-12 h-12 text-primary flex-shrink-0" />
+            <div className="overflow-hidden">
+              <p className="font-medium text-gray-800 dark:text-gray-200 truncate" title={file.name}>{file.name}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+            </div>
           </div>
-          <Button variant="outline" size="sm" onClick={removeFile} disabled={disabled} className="mt-2">
-            <X className="w-4 h-4 mr-2" />
-            Change File
+          <Button variant="ghost" size="icon" onClick={removeFile} disabled={disabled}>
+            <X className="w-5 h-5" />
           </Button>
         </div>
       ) : (
