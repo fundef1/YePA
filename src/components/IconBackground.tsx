@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faBook, faFile, faCog, faImage, faDownload, faUpload,
@@ -13,14 +13,13 @@ const icons: IconDefinition[] = [
   faFileImage, faFileCode, faFileExport, faFileImport
 ];
 
-// A more vibrant and visible color palette with increased opacity
 const colors = [
-  'rgba(168, 85, 247, 0.2)',   // Vibrant Purple
-  'rgba(244, 114, 182, 0.2)',  // Vibrant Pink
-  'rgba(59, 130, 246, 0.2)',   // Vibrant Blue
-  'rgba(34, 211, 238, 0.2)',   // Vibrant Cyan
-  'rgba(236, 72, 153, 0.2)',   // Another Pink
-  'rgba(139, 92, 246, 0.2)',   // Another Purple
+  'rgba(168, 85, 247, 0.2)',
+  'rgba(244, 114, 182, 0.2)',
+  'rgba(59, 130, 246, 0.2)',
+  'rgba(34, 211, 238, 0.2)',
+  'rgba(236, 72, 153, 0.2)',
+  'rgba(139, 92, 246, 0.2)',
 ];
 
 interface IconStyle {
@@ -37,31 +36,59 @@ const generateRandomIcons = (count: number): IconStyle[] => {
         position: 'absolute',
         top: `${Math.random() * 100}%`,
         left: `${Math.random() * 100}%`,
-        fontSize: `${Math.floor(Math.random() * 50 + 25)}px`, // 25px to 75px
+        fontSize: `${Math.floor(Math.random() * 50 + 25)}px`,
         color: colors[Math.floor(Math.random() * colors.length)],
         transform: `rotate(${Math.floor(Math.random() * 360)}deg)`,
-        transition: 'color 0.5s ease-in-out',
+        transition: 'filter 0.5s ease-in-out, color 0.5s ease-in-out',
       },
     });
   }
   return generatedIcons;
 };
 
-export const IconBackground = () => {
+interface IconBackgroundProps {
+  maxWidth: number;
+  maxHeight: number;
+}
+
+export const IconBackground = ({ maxWidth, maxHeight }: IconBackgroundProps) => {
   const [randomIcons, setRandomIcons] = useState<IconStyle[]>([]);
+  const filterId = "pixelate-filter";
+
+  const pixelationAmount = useMemo(() => {
+    if (maxWidth === 0 || maxHeight === 0) {
+      return { x: 0, y: 0 };
+    }
+    // Inverse correlation based on user's examples:
+    // 600px width -> 6px pixelation, 1200px -> 3px. Constant = 3600.
+    const x = Math.max(0, 3600 / maxWidth - 1);
+    const y = Math.max(0, 3600 / maxHeight - 1);
+    return { x, y };
+  }, [maxWidth, maxHeight]);
 
   useEffect(() => {
-    // Generate 50 icons for a denser, more visible effect
     setRandomIcons(generateRandomIcons(50));
   }, []);
 
+  const shouldUseFilter = pixelationAmount.x > 0 && pixelationAmount.y > 0;
+
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden" aria-hidden="true">
+      <svg style={{ position: 'absolute', width: 0, height: 0 }}>
+        <defs>
+          <filter id={filterId}>
+            <feMorphology operator="dilate" radius={`${pixelationAmount.x} ${pixelationAmount.y}`} />
+          </filter>
+        </defs>
+      </svg>
       {randomIcons.map((item, index) => (
         <FontAwesomeIcon
           key={index}
           icon={item.icon}
-          style={item.style}
+          style={{
+            ...item.style,
+            filter: shouldUseFilter ? `url(#${filterId})` : 'none',
+          }}
         />
       ))}
     </div>

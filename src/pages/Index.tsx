@@ -165,7 +165,10 @@ export default function Index() {
 
   return (
     <div className="min-h-screen py-8 sm:py-12">
-      <IconBackground />
+      <IconBackground
+        maxWidth={selectedTemplate.maxWidth}
+        maxHeight={selectedTemplate.maxHeight}
+      />
       <AnimatedGradientBackground isGrayscale={selectedTemplate.grayscaleLevels > 0} />
       <div className="container mx-auto max-w-5xl">
         <Header />
