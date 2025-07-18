@@ -187,7 +187,7 @@ export default function Index() {
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label>2. Upload your EPUB</Label>
+                <Label>2. Upload your ePUB</Label>
                 <FileUploader onFileSelect={handleFileChange} disabled={isProcessing} />
               </div>
               <div className="space-y-2">
@@ -209,7 +209,7 @@ export default function Index() {
                   ) : (
                     <div className="flex flex-col items-center gap-2 text-gray-600 dark:text-gray-400">
                       <DownloadCloud className="w-12 h-12 mb-2" />
-                      <p className="font-semibold text-center">Upload a file to enable download</p>
+                      <p className="font-semibold text-center">Upload an ePUB first</p>
                     </div>
                   )}
                 </div>
