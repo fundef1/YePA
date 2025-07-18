@@ -32,7 +32,7 @@ export const templates: Template[] = [
   },
   {
     name: "Kobo",
-    description: "Kobo image resizing (1404x1872) and 256-level grayscale",
+    description: "Kobo image resizing (1027x1448) and 256-level grayscale",
     replacements: [],
     filesToRemove: [],
     maxWidth: 1404,
