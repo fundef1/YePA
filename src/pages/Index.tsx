@@ -176,7 +176,7 @@ export default function Index() {
         <Card className="w-full shadow-lg dark:shadow-black/20">
           <CardContent className="space-y-6 pt-6">
             <div className="space-y-2">
-              <Label>1. Select an optimization profile</Label>
+              <Label>1. Select your eReader</Label>
               <ProfileSelector
                 templates={templates}
                 selectedValue={selectedTemplate.name}
