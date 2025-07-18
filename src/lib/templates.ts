@@ -39,7 +39,6 @@ export const templates: Template[] = [
     maxHeight: 1448,
     grayscaleLevels: 16,
   },
-  
   {
     name: "Remarkable",
     description: "Remarkable image resizing (1404x1872) and 256-level grayscale",
