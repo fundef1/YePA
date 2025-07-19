@@ -7,7 +7,7 @@ export const FooterAttribution = () => {
   return (
     <div className="p-4 text-center">
       <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-        Made with AI and Humans
+        Made by Artificially Intelligent and Other Humans
       </p>
       <div className="flex justify-center items-center space-x-6 text-gray-500 dark:text-gray-400">
         <a href="https://gemini.google.com/" target="_blank" rel="noopener noreferrer" aria-label="Google Gemini" className="hover:text-gray-800 dark:hover:text-gray-200 transition-colors">
