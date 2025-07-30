@@ -1,41 +1,70 @@
-"use client";
-
-import React from 'react';
+import { BookOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useMemo } from 'react';
 
 interface HeaderProps {
-  selectedProfileName: string;
-  // Assuming other props like logo, subtitle, etc. are passed here
-  // and their logic should remain unchanged as per your request.
+  isColorful: boolean;
+  maxWidth: number;
+  maxHeight: number;
 }
 
-export const Header: React.FC<HeaderProps> = ({ selectedProfileName }) => {
-  // Determine if the title should have the gradient effect.
-  // It should NOT have the gradient for "Remarkable", "NST", or "Kobo" profiles.
-  const shouldTitleBeGradient = !["Remarkable", "NST", "Kobo"].includes(selectedProfileName);
+export const Header = ({ isColorful, maxWidth, maxHeight }: HeaderProps) => {
+  const headerFilterId = "pixelate-filter-header";
 
-  // Ensure the title's container always has no filter applied,
-  // preventing it from disappearing due to an opacity filter.
-  // This specifically targets the div wrapping the h1.
-  const titleContainerFilter = 'none';
+  const pixelationAmount = useMemo(() => {
+    if (maxWidth === 0 || maxHeight === 0) {
+      return { width: 0, height: 0 };
+    }
+    // Calculate pixelation for the title at half strength
+    const width = (3600 / maxWidth) / 2;
+    const height = (6400 / maxHeight) / 2;
+    return { width, height };
+  }, [maxWidth, maxHeight]);
+
+  const { width: titlePixelWidth, height: titlePixelHeight } = pixelationAmount;
+  const shouldUsePixelateFilter = titlePixelWidth > 0 && titlePixelHeight > 0;
+
+  const titleFilterValue = shouldUsePixelateFilter ? `url(#${headerFilterId})` : 'none';
 
   return (
-    <header className="relative w-full p-4 flex flex-col items-center justify-center">
-      {/* Existing logic for logo and other elements remains unchanged */}
+    <div className="text-center mb-8">
+      {/* Define the SVG filter specifically for the header */}
+      <svg style={{ position: 'absolute', width: 0, height: 0 }}>
+        <defs>
+          {shouldUsePixelateFilter && (
+            <filter id={headerFilterId}>
+              <feFlood x={titlePixelWidth / 2} y={titlePixelHeight / 2} height="1" width="1" />
+              <feComposite width={titlePixelWidth} height={titlePixelHeight} />
+              <feTile result="a" />
+              <feComposite in="SourceGraphic" in2="a" operator="in" />
+              <feMorphology operator="dilate" radius={`${titlePixelWidth / 2} ${titlePixelHeight / 2}`} />
+            </filter>
+          )}
+        </defs>
+      </svg>
 
-      {/* Title */}
-      <div style={{ filter: titleContainerFilter }}>
-        <h1 className={cn(
-          "text-5xl font-bold tracking-tight transition-all duration-500",
-          shouldTitleBeGradient
-            ? "text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-400 to-cyan-300 drop-shadow-lg"
-            : "text-black dark:text-white" // Keep it black (or default text color) for specified profiles
-        )}>
-          YePA
-        </h1>
+      <div className="flex items-center justify-center gap-3 mb-2">
+        <BookOpen className={cn(
+          "w-10 h-10 transition-all duration-500",
+          isColorful ? "text-sky-400 drop-shadow-lg" : "text-gray-800 dark:text-gray-200"
+        )} />
+        <div style={{ filter: titleFilterValue }}>
+          <h1 className={cn(
+            "text-5xl font-bold tracking-tight transition-all duration-500",
+            isColorful 
+              ? "text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-400 to-cyan-300 drop-shadow-lg" 
+              : "text-gray-800 dark:text-gray-200"
+          )}>
+            YePA
+          </h1>
+        </div>
       </div>
-
-      {/* Existing logic for subtitle and other elements remains unchanged */}
-    </header>
+      <p className={cn(
+        "text-lg transition-all duration-500",
+        isColorful ? "text-sky-400 drop-shadow-md" : "text-muted-foreground"
+      )}>
+        Yet <span className="font-semibold">ePUB</span> Another Processor
+      </p>
+    </div>
   );
 };
