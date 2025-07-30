@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Index from './pages/Index'; // Assuming this is your main page
-import { FooterAttribution } from './components/FooterAttribution'; // Assuming this is used
+// import { FooterAttribution } from './components/FooterAttribution'; // No longer needed here
 
 function App() {
   // Determine the basename dynamically based on the environment.
@@ -18,7 +18,7 @@ function App() {
             {/* Add other routes here if you have them */}
           </Routes>
         </main>
-        <FooterAttribution />
+        {/* Removed FooterAttribution from here to prevent duplication */}
       </div>
     </Router>
   );
