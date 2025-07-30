@@ -1,53 +1,47 @@
-import { BookOpen } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { useMemo } from 'react';
+import { cn } from "@/lib/utils";
+import { useProfile } from '@/hooks/useProfile'; // Assuming a custom hook provides the profile
 
-interface HeaderProps {
-  isColorful: boolean;
-  maxWidth: number;
-  maxHeight: number;
-}
+export const Header = () => {
+  const { profile } = useProfile(); // e.g., 'NST', 'Kobo', 'Remarkable'
 
-export const Header = ({ isColorful, maxWidth, maxHeight }: HeaderProps) => {
-  const headerFilterId = "pixelate-filter-header";
-
-  const pixelationAmount = useMemo(() => {
-    if (maxWidth === 0 || maxHeight === 0) {
-      return { width: 0, height: 0 };
+  const titleFilterValue = useMemo(() => {
+    switch (profile) {
+      case 'NST':
+        return 'url(#nst-filter)';
+      case 'Kobo':
+        return 'url(#kobo-filter)';
+      case 'Remarkable':
+        return 'url(#remarkable-filter)'; // FIX: Apply the new subtle filter
+      default:
+        return 'none';
     }
-    // Calculate pixelation for the title at half strength
-    const width = (3600 / maxWidth) / 2;
-    const height = (6400 / maxHeight) / 2;
-    return { width, height };
-  }, [maxWidth, maxHeight]);
+  }, [profile]);
 
-  const { width: titlePixelWidth, height: titlePixelHeight } = pixelationAmount;
-  const shouldUsePixelateFilter = titlePixelWidth > 0 && titlePixelHeight > 0;
-
-  const titleFilterValue = shouldUsePixelateFilter ? `url(#${headerFilterId})` : 'none';
+  const isColorful = useMemo(() => {
+    return profile !== 'Pass-Through';
+  }, [profile]);
 
   return (
-    <div className="text-center mb-8">
-      {/* Define the SVG filter specifically for the header */}
-      <svg style={{ position: 'absolute', width: 0, height: 0 }}>
+    <header>
+      <svg className="absolute w-0 h-0">
         <defs>
-          {shouldUsePixelateFilter && (
-            <filter id={headerFilterId}>
-              <feFlood x={titlePixelWidth / 2} y={titlePixelHeight / 2} height="1" width="1" />
-              <feComposite width={titlePixelWidth} height={titlePixelHeight} />
-              <feTile result="a" />
-              <feComposite in="SourceGraphic" in2="a" operator="in" />
-              <feMorphology operator="dilate" radius={`${titlePixelWidth / 2} ${titlePixelHeight / 2}`} />
-            </filter>
-          )}
+          <filter id="nst-filter">
+            <feTurbulence type="fractalNoise" baseFrequency="0.02 0.02" numOctaves="1" result="turbulence" />
+            <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="25" xChannelSelector="R" yChannelSelector="G" />
+          </filter>
+          <filter id="kobo-filter">
+            <feTurbulence type="fractalNoise" baseFrequency="0.04 0.04" numOctaves="1" result="turbulence" />
+            <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="15" xChannelSelector="R" yChannelSelector="G" />
+          </filter>
+          {/* ADDED: New subtle filter for the Remarkable profile */}
+          <filter id="remarkable-filter">
+            <feTurbulence type="fractalNoise" baseFrequency="0.08 0.08" numOctaves="1" result="turbulence" />
+            <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="7" xChannelSelector="R" yChannelSelector="G" />
+          </filter>
         </defs>
       </svg>
-
-      <div className="flex items-center justify-center gap-3 mb-2">
-        <BookOpen className={cn(
-          "w-10 h-10 transition-all duration-500",
-          isColorful ? "text-sky-400 drop-shadow-lg" : "text-gray-800 dark:text-gray-200"
-        )} />
+      <div className="text-center mb-8">
         <div style={{ filter: titleFilterValue }}>
           <h1 className={cn(
             "text-5xl font-bold tracking-tight transition-all duration-500",
@@ -58,13 +52,10 @@ export const Header = ({ isColorful, maxWidth, maxHeight }: HeaderProps) => {
             YePA
           </h1>
         </div>
+        <p className="text-lg text-gray-600 dark:text-gray-400 mt-2">
+          Your ePaper Assistant
+        </p>
       </div>
-      <p className={cn(
-        "text-lg transition-all duration-500",
-        isColorful ? "text-sky-400 drop-shadow-md" : "text-muted-foreground"
-      )}>
-        Yet <span className="font-semibold">ePUB</span> Another Processor
-      </p>
-    </div>
+    </header>
   );
 };
