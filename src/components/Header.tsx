@@ -63,7 +63,7 @@ export const Header = ({ isColorful, maxWidth, maxHeight }: HeaderProps) => {
         "text-lg transition-all duration-500",
         isColorful ? "text-sky-400 drop-shadow-md" : "text-muted-foreground"
       )}>
-        Yet <span className="font-semibold">ePUB</span> Another Processor
+        Yet <span className="font-semibold">ePUB</span> Processor Another
       </p>
     </div>
   );
