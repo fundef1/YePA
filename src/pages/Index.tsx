@@ -50,41 +50,16 @@ export default function Index() {
   });
   const [processedBlob, setProcessedBlob] = useState<Blob | null>(null);
   const [processedFilename, setProcessedFilename] = useState<string>("");
-  const [currentProcessingFile, setCurrentProcessingFile] = useState<string>("");
   const logContainerRef = useRef<HTMLPreElement>(null);
 
   const appendLog = useCallback((message: string) => {
     setLog((prevLog) => [...prevLog, message]);
-
-    let fullPath = "";
-    if (message.includes("Resizing candidate:")) {
-        fullPath = message.split("Resizing candidate: ")[1].split(" (")[0];
-    } else if (message.includes("Grayscaling candidate:")) {
-        fullPath = message.split("Grayscaling candidate: ")[1];
-    } else if (message.includes("Adding to zip:")) {
-        fullPath = message.split("Adding to zip: ")[1].split(" (")[0];
-    } else if (message.includes("Modifying ")) {
-        fullPath = message.split("Modifying ")[1].replace("...", "");
-    } else if (message.includes("Removing file:")) {
-        fullPath = message.split("Removing file: ")[1];
-    }
-
-    if (fullPath) {
-        const pathParts = fullPath.split('/');
-        const filename = pathParts[pathParts.length - 1];
-        setCurrentProcessingFile(filename);
-    }
-
-    if (message.startsWith("Processing complete") || message.startsWith("FATAL ERROR")) {
-        setCurrentProcessingFile("");
-    }
   }, []);
 
   const processEpub = useCallback(async (file: File, templateName: string) => {
     setIsProcessing(true);
     setProcessedBlob(null);
     setProcessedFilename("");
-    setCurrentProcessingFile("");
     setLog([`Starting processing with template: ${templateName}...`]);
     setProgress(0);
 
@@ -155,7 +130,6 @@ export default function Index() {
       setProgress(0);
       setProcessedBlob(null);
       setProcessedFilename("");
-      setCurrentProcessingFile("");
     }
   };
 
@@ -225,8 +199,8 @@ export default function Index() {
                         >
                           {isProcessing ? "Processing..." : "Download File"}
                         </Button>
-                        <p className="mt-2 text-sm text-muted-foreground truncate h-5" title={currentProcessingFile || undefined}>
-                          {isProcessing && currentProcessingFile ? currentProcessingFile : <>&nbsp;</>}
+                        <p className="mt-2 text-sm text-muted-foreground truncate h-5">
+                          {isProcessing ? 'Working...' : <>&nbsp;</>}
                         </p>
                       </div>
                     </div>
