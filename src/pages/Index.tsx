@@ -192,23 +192,16 @@ export default function Index() {
                     <div className="flex flex-col items-center gap-4 text-center">
                       <DownloadCloud className="w-12 h-12 text-primary" />
                       <div className="w-full max-w-xs">
-                        {isProcessing ? (
-                          <Button disabled className="w-full text-lg py-6 relative overflow-hidden">
-                            <div 
-                              className="absolute top-0 left-0 h-full bg-primary/30 transition-all duration-150" 
-                              style={{ width: `${progress}%` }} 
-                            />
-                            <span className="relative z-10">Processing... {Math.round(progress)}%</span>
-                          </Button>
-                        ) : (
-                          <Button
-                            onClick={handleDownload}
-                            disabled={!processedBlob}
-                            className="w-full text-lg py-6"
-                          >
-                            Download File
-                          </Button>
-                        )}
+                        <Button
+                          onClick={handleDownload}
+                          disabled={isProcessing || !processedBlob}
+                          className="w-full text-lg py-6"
+                        >
+                          {isProcessing ? "Processing..." : "Download File"}
+                        </Button>
+                        <p className="mt-2 text-sm text-muted-foreground truncate h-5">
+                          {isProcessing ? 'Working...' : <>&nbsp;</>}
+                        </p>
                       </div>
                     </div>
                   ) : (
