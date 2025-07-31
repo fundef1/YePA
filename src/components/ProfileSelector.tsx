@@ -49,7 +49,7 @@ export const ProfileSelector: React.FC<ProfileSelectorProps> = ({
                 >
                   <RadioGroupItem value={template.name} className="sr-only" />
                   <img
-                    src={`/${imageName}.png`}
+                    src={template.image}
                     alt={template.name}
                     className="mb-3 h-20 w-20 object-contain bg-gray-200 dark:bg-gray-700 rounded-md"
                   />
