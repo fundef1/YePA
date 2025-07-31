@@ -18,6 +18,7 @@ export const templates: Template[] = [
     {
     name: "NST",
     description: "NOOK Simple Touch with image resizing (600x800) and 16-level grayscale.",
+    image: "nst.png",
     replacements: [
       {
         file: "OEBPS/content.opf",
@@ -33,6 +34,7 @@ export const templates: Template[] = [
   {
     name: "Kobo",
     description: "Kobo image resizing (1027x1448) and 16-level grayscale",
+    image: "kobo.png",
     replacements: [],
     filesToRemove: [],
     maxWidth: 1027,
@@ -42,6 +44,7 @@ export const templates: Template[] = [
   {
     name: "Remarkable",
     description: "Remarkable image resizing (1404x1872) and 256-level grayscale",
+    image: "remarkable.png",
     replacements: [],
     filesToRemove: [],
     maxWidth: 1404,
@@ -51,6 +54,7 @@ export const templates: Template[] = [
   {
     name: "Pass-Through",
     description: "Unpack and Repack only",
+    image: "pass-through.png",
     replacements: [],
     filesToRemove: [],
     maxWidth: 0,
