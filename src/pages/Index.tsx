@@ -203,7 +203,7 @@ export default function Index() {
                                 className="absolute top-0 left-0 h-full bg-primary/50 dark:bg-primary/30"
                                 style={{ width: `${progress}%`, transition: 'width 0.1s ease-in-out' }}
                               />
-                              <span className="relative z-10 tabular-nums">
+                              <span className="relative z-10">
                                 Processing... {Math.round(progress)}%
                               </span>
                             </>
