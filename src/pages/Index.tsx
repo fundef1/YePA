@@ -195,21 +195,9 @@ export default function Index() {
                         <Button
                           onClick={handleDownload}
                           disabled={isProcessing || !processedBlob}
-                          className="w-full text-lg py-6 relative overflow-hidden transition-colors"
+                          className="w-full text-lg py-6"
                         >
-                          {isProcessing ? (
-                            <>
-                              <div
-                                className="absolute top-0 left-0 h-full bg-primary/50 dark:bg-primary/30"
-                                style={{ width: `${progress}%`, transition: 'width 0.1s ease-in-out' }}
-                              />
-                              <span className="relative z-10">
-                                Processing... {Math.round(progress)}%
-                              </span>
-                            </>
-                          ) : (
-                            "Download File"
-                          )}
+                          {isProcessing ? "Processing..." : "Download File"}
                         </Button>
                         <p className="mt-2 text-sm text-muted-foreground truncate h-5">
                           {isProcessing ? <>&nbsp;</> : <>&nbsp;</>}
@@ -243,6 +231,12 @@ export default function Index() {
                 </CollapsibleTrigger>
               </div>
               <CollapsibleContent className="pt-2">
+                {isProcessing && (
+                  <div className="w-full my-2">
+                    <Progress value={progress} />
+                    <p className="text-sm text-center text-muted-foreground mt-1">{Math.round(progress)}%</p>
+                  </div>
+                )}
                 <div className="w-full h-48 bg-slate-100 dark:bg-slate-800 rounded-md p-3">
                   <pre ref={logContainerRef} className="text-xs font-mono whitespace-pre-wrap h-full overflow-y-auto">
                     {log.join('\n')}
