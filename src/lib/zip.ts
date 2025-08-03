@@ -16,7 +16,7 @@ export const zipFileContents = async (
   setProgress: (progress: number) => void
 ): Promise<Blob> => {
   appendLog("Zipping file...");
-  const writer = new ZipWriter(new BlobWriter("application/zip"), { extendedTimestamp: false });
+  const writer = new ZipWriter(new BlobWriter("application/epub+zip"), { extendedTimestamp: false });
 
   let mimetypeEntry: { filename: string; data: Blob } | undefined;
   const otherEntries: { filename: string; data: Blob }[] = [];
