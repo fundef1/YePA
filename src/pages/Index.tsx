@@ -200,7 +200,7 @@ export default function Index() {
                           {isProcessing ? "Processing..." : "Download File"}
                         </Button>
                         <p className="mt-2 text-sm text-muted-foreground truncate h-5">
-                          {isProcessing ? 'Working...' : <>&nbsp;</>}
+                          {isProcessing ? <>&nbsp;</> : <>&nbsp;</>}
                         </p>
                       </div>
                     </div>
