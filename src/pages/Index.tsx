@@ -198,12 +198,12 @@ export default function Index() {
                         >
                           {isProcessing && (
                             <div
-                              className="absolute top-0 left-0 h-full bg-primary-foreground/20"
+                              className="absolute top-0 left-0 h-full bg-primary-foreground/30"
                               style={{ width: `${progress}%`, transition: 'width 0.1s linear' }}
                             />
                           )}
                           <span className="relative">
-                            {isProcessing ? `Processing... ${Math.round(progress)}%` : "Download File"}
+                            {isProcessing ? "Processing..." : "Download File"}
                           </span>
                         </Button>
                       </div>
